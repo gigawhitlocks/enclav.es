@@ -1,1 +1,44 @@
-(use 'the-known-net.core)
+use '(project.clj
+)
+use '(adder)
+(require 'adder.core')
+(require 'adder.core)
+adder.core/-main
+(require 'adder.core)
+adder.core/-main
+help
+(help)
+(user/help)
+(require 'adder.core)
+source -main
+(source main)
+(source -main)
+(source adder.core/-main)
+(adder.core/-main)
+(run-jetty view-input {:port 1337 :join? true})
+(ring.adapter.jetty/run-jetty view-input {:port 1337 :join? true})
+(ring.adapter.jetty/run-jetty adder.core/view-input {:port 1337 :join? true})
+(ring.adapter.jetty/run-jetty adder.core/view-input [] {:port 1337 :join? true})
+(require 'adder.core)
+(source adder.core/view-input
+)
+(use adder.core)
+(use 'adder.core)
+(-main)
+(use 'adder.core)
+(-main)
+(source -main)
+(-main)
+(use ring.adapter.jetty
+)
+(use ring.adapter.jetty)
+(use 'ring.adapter.jetty)
+(run-jetty view-input {:port 1337 :join? true})
+ 
+(run-jetty view-input {:port 1337 :join? true})
+(use 'adder.core)
+(adder.core/-main)
+(use 'adder.core)
+(adder.core/-main)
+(use 'adder.core)
+(adder.core/-main)
