@@ -1,4 +1,4 @@
-(defproject adder "0.0.1"
+(defproject the-known-net "0.0.1"
     :description "Add two numbers."
     :dependencies
       [[org.clojure/clojure "1.4.0"]
