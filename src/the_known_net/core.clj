@@ -41,11 +41,12 @@
 
 (defn signup []
   [:div {:class "signup"}
-   [:form {:method "post" :action "/signup"}
+   [:form {:method "post" :action "/sign-up"}
     [:input.text]]])
 
 (defn signin-page [] 
   (view-layout
+          (landing-page)
           (signup)))
 
 
