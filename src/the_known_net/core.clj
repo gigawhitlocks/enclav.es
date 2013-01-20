@@ -1,5 +1,4 @@
 (ns the-known-net.core
-    (:use compojure.core)
     (:use hiccup.core)
     (:use hiccup.page-helpers)
     (:use ring.adapter.jetty))
