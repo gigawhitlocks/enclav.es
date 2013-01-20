@@ -1,11 +1,13 @@
 (ns the-known-net.core
     (:use hiccup.core)
-    (:use hiccup.page-helpers)
-    (:use ring.adapter.jetty))
+    (:use hiccup.page)
+    (:use hiccup.form)
+    (:use ring.adapter.jetty)
+    (:use compojure.core)
+    (:require [compojure.route :as route]))
 
 (defn view-layout [& content]
     (html
-          (doctype :xhtml-strict)
           (xhtml-tag "en"
                            [:head
                                     [:meta {:http-equiv "Content-type"

@@ -54,3 +54,4 @@ source -main
 (the-known-net.core/-main)
 (use 'the-known-net.core)
 (the-known-net.core/-main)
+(use 'the-known-net.core)
