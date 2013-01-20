@@ -41,12 +41,11 @@
 (defn signup []
   [:div {:class "signup"}
    [:form {:method "post" :action "/signup"}
-    [:input.text
+    [:input.text]]])
 
 (defn signin-page [] 
   (view-layout
-          (signup)
-          (signin)))
+          (signup)))
 
 
 (defroutes app

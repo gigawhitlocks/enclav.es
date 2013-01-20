@@ -1,8 +1,7 @@
 (defproject the-known-net "0.0.1"
-    :description "Add two numbers."
+    :description "An experimental online meta-community."
     :dependencies
       [[org.clojure/clojure "1.4.0"]
-            [org.clojure/clojure-contrib "1.2.0"]
             [ring/ring-core "0.2.5"]
             [ring/ring-devel "0.2.5"]
             [ring/ring-jetty-adapter "0.2.5"]
