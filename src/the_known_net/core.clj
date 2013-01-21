@@ -42,7 +42,7 @@
 (defn signup []
   [:div {:class "signup"}
    [:form {:method "post" :action "/sign-up"}
-    [:input.text]]])
+    [:br][:input.text]]])
 
 (defn signin-page [] 
   (view-layout
