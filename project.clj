@@ -11,6 +11,7 @@
           [sandbar/sandbar "0.4.0-SNAPSHOT"]
            [compojure "1.1.5"]]
     :dev-dependencies
-      [[lein-run "1.0.0-SNAPSHOT"]])
+      [[lein-run "1.0.0-SNAPSHOT"]]
+    :main the-known-net.core)
 
 
