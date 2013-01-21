@@ -36,10 +36,10 @@
   (view-layout
       [:h1 "theknown.net"]
       [:h2 "is invite only."]
-      [:br][:a {:href "sign-in"} "I have an account or an invitation."]))
+      [:br][:a {:style "position:absolute; bottom:14%" :href "sign-in"} "I have an account or an invitation."]))
 
 (defn signup []
-  [:div {:class "signup"}
+  [:div 
    [:form {:method "post" :action "/sign-up"}
     [:br][:input.text]]])
 
@@ -54,8 +54,7 @@
              (landing-page))
     (GET "/sign-in" [] 
              (signin-page)))
-;:w
-;
+
 ;    (POST "/" [a b]
 ;              (let [[a b] (parse-input a b)
 ;                              sum   (+ a b)]
