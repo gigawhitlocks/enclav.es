@@ -36,7 +36,7 @@
   (view-layout
       [:h1 "theknown.net"]
       [:h2 "is invite only."]
-      [:a {:href "sign-in"} "I have an account or an invitation."]))
+      [:br][:a {:href "sign-in"} "I have an account or an invitation."]))
 
 (defn signup []
   [:div {:class "signup"}
