@@ -7,14 +7,13 @@
     (:require [compojure.route :as route]))
 
 (defn view-layout [& content]
-    (html
-          (xhtml-tag "en"
-                           [:head
-                                    [:meta {:http-equiv "Content-type"
-                                                            :content "text/html; charset=utf-8"}]
-                                    [:title "theknown.net"]
-                                    [:link {:href "http://theknown.net/main.css" :type "text/css" :rel "stylesheet"} ]]
-                           [:body content])))
+    (html (xhtml-tag "en"
+          [:head
+                 [:meta {:http-equiv "Content-type"
+                         :content "text/html; charset=utf-8"}]
+                 [:title "theknown.net"]
+                 [:link {:href "http://theknown.net/main.css" :type "text/css" :rel "stylesheet"} ]]
+          [:body content])))
 
 (defn view-input []
     (view-layout
