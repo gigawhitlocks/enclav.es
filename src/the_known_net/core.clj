@@ -1,8 +1,9 @@
 (ns the-known-net.core
-    (:use hiccup.core)
-    (:use hiccup.page)
-    (:use ring.adapter.jetty)
-    (:use compojure.core)
+    (:use [hiccup.core] 
+          [hiccup.page]
+          [ring.adapter.jetty]
+          [compojure.core])
+
     (:require [compojure.route :as route]))
 
 ;Generates HTML header and shit
