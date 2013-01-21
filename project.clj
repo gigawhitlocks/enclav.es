@@ -8,6 +8,7 @@
            ; [compojure "0.4.0"]
           ;  [hiccup "0.2.6"]]
           [hiccup "1.0.2"]
+          [sandbar/sandbar "0.4.0-SNAPSHOT"]
            [compojure "1.1.5"]]
     :dev-dependencies
       [[lein-run "1.0.0-SNAPSHOT"]])
