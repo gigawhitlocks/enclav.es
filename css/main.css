@@ -1,36 +1,41 @@
 h1 {
 
-	color: #006633;
+	color: #12795D;
 /*	color: #03436A;*/
 /*	color: #0F472A;*/
 	margin: 0;
-	font-family: Helvetica,Arial,sans-serif;
-	display: inline;
 }
 
 h2 {
-	color: #006633;
+	color: #12795D;
 /*	color: #0F472A;*/
 	margin: 0;
-	font-family: Helvetica,Arial,sans-serif;
-	display: inline;
 
 }
+
+.isinviteonly {
+	display: inline;
+}
+
 body {
-	background-color: #66cc99;
+/*	background-color: #307050;*/
+	background-color: #88DDC5;
 	padding: 0;
 	margin: 0;
-	padding-left: 15%;
-	padding-right: 30%;
-	padding-top: 10%;
+	font-family:quattrocento-sans,Helvetica,Arial,sans-serif;
 
 }
 div .content {
-	z-index: 2;
+	margin-left: 15%;
+	margin-right: 30%;
+	margin-top: 10%;
+	padding-left: 15%;
+	padding-right: 30%;
+	padding-top: 10%;
 }
 a {
 
-	color: #003366;
+	color: #164379;
 /*	color: #245A7A;*/
 /*	color: #FF5300; red */ 
 /*	color: #000000; black */ 
