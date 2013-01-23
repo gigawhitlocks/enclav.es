@@ -1,6 +1,6 @@
 h1 {
 
-	color: #DD6164;
+	color: #006633;
 /*	color: #03436A;*/
 /*	color: #0F472A;*/
 	margin: 0;
@@ -9,7 +9,7 @@ h1 {
 }
 
 h2 {
-	color: #C3B264;
+	color: #006633;
 /*	color: #0F472A;*/
 	margin: 0;
 	font-family: Helvetica,Arial,sans-serif;
@@ -17,8 +17,7 @@ h2 {
 
 }
 body {
-/*	background-color: #307050;*/
-	background-color: #EFDD89;
+	background-color: #66cc99;
 	padding: 0;
 	margin: 0;
 	padding-left: 15%;
@@ -31,7 +30,7 @@ div .content {
 }
 a {
 
-	color: #00AE68;
+	color: #003366;
 /*	color: #245A7A;*/
 /*	color: #FF5300; red */ 
 /*	color: #000000; black */ 
