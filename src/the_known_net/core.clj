@@ -21,9 +21,10 @@
 ;Generates the site's landing page
 (defn landing-page [] 
   (view-layout "" ; first arg is page title
+      [:div {:class "content"}
       [:h1 {:class "isinviteonly"} "theknown.net "]
       [:h2 {:class "isinviteonly"} "is invite-only."]
-      [:br][:a {:style "position:absolute; bottom:14%" :href "sign-in"} "I have an account or an invitation."]))
+      [:br][:a {:style "position:absolute; bottom:14%" :href "sign-in"} "I have an account or an invitation."]]))
 
 
 (defn notfounderror-page []
