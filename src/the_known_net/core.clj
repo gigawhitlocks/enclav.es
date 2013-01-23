@@ -1,8 +1,8 @@
 (ns the-known-net.core
-    (:use [hiccup.core] 
-          [hiccup.page]
-          [ring.adapter.jetty]
-          [compojure.core])
+    (:use hiccup.core 
+          hiccup.page
+          ring.adapter.jetty
+          compojure.core)
 
     (:require [compojure.route :as route]))
 
@@ -36,11 +36,9 @@
 
 ;Routes
 (defroutes app
-    (GET "/" []
-             (landing-page))
+    (GET "/"        [] (landing-page))
+ ;  (GET "/sign-in" [] (signin-page)))
     (route/not-found (notfounderror-page))) ; TODO: IMPLEMENT 404 PAGE
- ;   (GET "/sign-in" [] 
-  ;           (signin-page)))
 
 (defn -main []
     (run-jetty #'the-known-net.core/app {:port 1337 :join? true}))
