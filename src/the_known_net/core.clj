@@ -21,14 +21,15 @@
 (defn landing-page [] 
   (view-layout "" ; first arg is page title
       [:h1 {:class "isinviteonly"} "theknown.net "]
-      [:h2 {:class "isinviteonly"} "is invite only."]
+      [:h2 {:class "isinviteonly"} "is invite-only."]
       [:br][:a {:style "position:absolute; bottom:14%" :href "sign-in"} "I have an account or an invitation."]))
 
 
 ;Routes
 (defroutes app
     (GET "/" []
-             (landing-page)))
+             (landing-page))
+    (route/not-found (landing-page)))
  ;   (GET "/sign-in" [] 
   ;           (signin-page)))
 
