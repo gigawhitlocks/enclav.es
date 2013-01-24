@@ -12,7 +12,7 @@
               [sandbar.core :refer :all]
               [sandbar.auth :refer [with-security]]
               [sandbar.stateful-session :refer [wrap-stateful-session]]
-              [the-known-net.css :refer :all]
+              [the-known-net.styles :refer :all]
               ))
 
 ; WELCOME TO THEKNOWN.NET'S SOURCE CODE
