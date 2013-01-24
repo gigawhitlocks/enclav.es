@@ -4,17 +4,25 @@
     :dependencies
       [[org.clojure/clojure "1.4.0"]
             [ring "1.1.8"]
-            [hiccup "1.0.2"]
+            [hiccup "1.0.0"]
             [sandbar/sandbar "0.4.0-SNAPSHOT"]
             [compojure "1.1.5"]
             [korma "0.3.0-RC2"] 
             [clj-style "1.0.1"]]
     :dev-dependencies
-      [[lein-run "1.0.0-SNAPSHOT"]]
+      [[lein-run "1.0.0-SNAPSHOT"]
+       [ring/ring-devel "1.1.0"]]
     :ring {:handler the-known-net.core/app
            :auto-reload? true
            :auto-refresh? true}
-    :jvm-opts ["-Xmx2g" "-XX:+UseConcMarkSweepGC"]
+    ; jvm tweaks mostly borrowed from Overtone's project.clj
+    :jvm-opts ["-Xms1g" "-Xmx2g"              ; min and max heap sizes
+               "-XX:+UseParNewGC"             ; use newer parallel GC with
+               "-XX:+UseConcMarkSweepGC"      ;  the concurrent garbage collector
+               "-XX:+CMSConcurrentMTEnabled"  ; enable muli-threaded concurrent GC work
+               "-XX:MaxGCPauseMillis=20"      ; specify target of 20ms for max GC pauses
+               "-XX:+CMSIncrementalMode"      ; do many small GC cycles to minimize pauses
+               ]
     :main the-known-net.core)
 
 
