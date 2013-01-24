@@ -8,12 +8,13 @@
             [sandbar/sandbar "0.4.0-SNAPSHOT"]
             [compojure "1.1.5"]
             [korma "0.3.0-RC2"] 
-            [cssgen "0.2.6"]]
+            [clj-style "1.0.1"]]
     :dev-dependencies
       [[lein-run "1.0.0-SNAPSHOT"]]
     :ring {:handler the-known-net.core/app
            :auto-reload? true
            :auto-refresh? true}
+    :jvm-opts ["-Xmx2g" "-XX:+UseConcMarkSweepGC"]
     :main the-known-net.core)
 
 
