@@ -1,8 +1,11 @@
 (ns the-known-net.core
-    (:use hiccup.core 
-          hiccup.page
-          ring.adapter.jetty
-          compojure.core)
+    (:use [hiccup.core]
+          [hiccup.page]
+          [compojure core response]
+          [ring.adapter.jetty :only [run-jetty]]
+          [ring.util.response]
+          [ring.middleware file file-info stacktrace reload]
+          )
 
     (:require [compojure.route :as route]))
 
@@ -14,7 +17,8 @@
                          :content "text/html; charset=utf-8"}]
                  [:title ( str "theknown.net" title )]
                  [:script {:src "http://use.edgefonts.net/quattrocento-sans.js"}]
-                 [:link {:href "http://theknown.net/main.css" :type "text/css" :rel "stylesheet"} ]]
+                 [:link {:href "http://theknown.net/main.css" :type "text/css" :rel "stylesheet"} ]
+           ]
           [:body content])))
 
 
@@ -23,7 +27,7 @@
   (view-layout "" ; first arg is page title
       [:div {:class "content"}
       [:h1 {:class "isinviteonly"} "theknown.net "]
-      [:h2 {:class "isinviteonly"} "is invite-only."]
+      [:h2 {:class "isinviteonly"} "is invite-only"]
       [:br][:a {:style "position:absolute; bottom:14%" :href "sign-in"} "I have an account or an invitation."]]))
 
 
@@ -37,9 +41,13 @@
 ;Routes
 (defroutes app
     (GET "/"        [] (landing-page))
- ;  (GET "/sign-in" [] (signin-page)))
-    (route/not-found (notfounderror-page))) ; TODO: IMPLEMENT 404 PAGE
+;   (GET "/sign-in" [] (signin-page)))
+    (route/not-found (notfounderror-page)) ; TODO: IMPLEMENT 404 PAGE
+)
+
+(defn start-server []
+    (run-jetty #'the-known-net.core/app {:port 1337 :join? false}))
 
 (defn -main []
-    (run-jetty #'the-known-net.core/app {:port 1337 :join? true}))
+  (start-server))
 
