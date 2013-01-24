@@ -4,9 +4,9 @@
           [compojure core response]
           [ring.adapter.jetty :only [run-jetty]]
           ;[ring.util.response]
-          [ring.middleware file file-info stacktrace reload])
-    (:require [clj-style.core :as cs]
-              [compojure.route :as route]))
+          [ring.middleware file file-info stacktrace reload]
+          the-known-net.css)
+    (:require [compojure.route :as route]))
 
 ; WELCOME TO THEKNOWN.NET'S SOURCE CODE
 ; THE STATE OF THE PROJECT SECTION:
@@ -18,56 +18,13 @@
 ;
 ;
 ; 2) Below we have some CSS that should do for the landing page and the sign-in/up page and any error pages.
-; 3) We also have routes for those pages.
+; 2.1) moved css to css.clj BOOYAH
+;
+; 3) We also have routes faor those pages.
 ; 4) POST and shit aren't implemented yet.
 ; 5) Aww, yeah.
 ;
 
-
-; GENERATE CSS IN THIS SECTION
-
-;CSS colors
-(def darkgreen "#12795D")
-(def lightgreen "#88DDC5")
-(def font-family "quattrocento-sans,Helvetica,Arial,sans-serif")
-(def darkblue "#164379")
-
-
-; CSS for the landing page/signin page/login page
-(defn landingcss [] 
-  (cs/defrule h1
-   [:h1 
-    :color darkgreen
-    :margin 0
-    :font-size "5em"])
-
-  (cs/defrule h2
-   [:h2
-    :color darkgreen
-    :margin 0
-    :font-size "4em"])
-
-  (cs/defrule body
-   [:body
-    :background-color lightgreen
-    :margin 0
-    :padding 0
-    :font-family font-family])
-
- (cs/defrule content
-  [:.content
-   :display "block"
-   :margin-left "15%"
-   :margin-top "10%"])
-
-  (cs/defrule links
-   [:a
-    :text-decoration "none"
-    :color darkblue
-    :font-size "2em"
-    :font-family font-family])
-
-  (cs/render))
 
 ; GENERATE HTML IN THIS SECTION
 
