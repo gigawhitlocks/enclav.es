@@ -1,16 +1,13 @@
 (ns the-known-net.core
     (:use [hiccup.core]
-          [hiccup.page]
+          [hiccup.page :only [xhtml-tag]]
           [compojure core response]
           [ring.adapter.jetty :only [run-jetty]]
-          [ring.util.response]
+          ;[ring.util.response]
           [ring.middleware file file-info stacktrace reload])
-    (:require [clj-style.core :as cs])
-    (:require [compojure.route :as route]))
+    (:require [clj-style.core :as cs]
+              [compojure.route :as route]))
 
-;
-;
-;
 ; WELCOME TO THEKNOWN.NET'S SOURCE CODE
 ; THE STATE OF THE PROJECT SECTION:
 ;
@@ -85,12 +82,9 @@
 (defn view-layout [ title css & content ]
     (html (xhtml-tag "en"
           [:head
-                 [:meta {:http-equiv "Content-type"
-                         :content "text/html; charset=utf-8"}]
+                 [:meta {:http-equiv "Content-type" :content "text/html; charset=utf-8"}]
                  [:script {:src "http://use.edgefonts.net/quattrocento-sans.js"}]
-
                  [:title  (maketitle title) ]
-
                  [:style {:type "text/css"} css ]
            ]
           [:body content])))
@@ -99,16 +93,14 @@
 (defn landing-page [] 
   (view-layout "" (landingcss) ; first arg is page title ;second is css
       [:div {:class "content"}
-      [:h1 {:style "display:inline" } "theknown.net "]
+      [:h1 {:style "display:inline" } "theknown.net "][:p]
       [:h2 {:style "display:inline" }"is invite-only"]
       [:br][:a {:style "position:absolute; bottom:14%" :href "sign-in"} "I have an account or an invitation." ]]))
-
 
 ;Generate the page with the login form and the signup form
 (defn signin-page []
   (view-layout "Sign in / Sign up" (landingcss)
                ))
-
 
 ;404 page
 (defn notfounderror-page []
@@ -128,11 +120,10 @@
     (route/not-found (notfounderror-page)) ; TODO: IMPLEMENT 404 PAGE
 )
 
-
-;run the server; main
+;run the server
 (defn start-server []
     (run-jetty #'the-known-net.core/app {:port 1337 :join? false}))
 
+; main
 (defn -main []
   (start-server))
-
