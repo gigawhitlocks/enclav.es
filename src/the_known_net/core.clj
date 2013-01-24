@@ -8,7 +8,23 @@
     (:require [clj-style.core :as cs])
     (:require [compojure.route :as route]))
 
-
+;
+;
+;
+; WELCOME TO THEKNOWN.NET'S SOURCE CODE
+; THE STATE OF THE PROJECT SECTION:
+;
+;
+; 
+; 1) Right now everything is in this file. Eventually, things should be broken up.
+;    It's going to get unwieldy -fast-. We should discuss how best to do this.
+;
+;
+; 2) Below we have some CSS that should do for the landing page and the sign-in/up page and any error pages.
+; 3) We also have routes for those pages.
+; 4) POST and shit aren't implemented yet.
+; 5) Aww, yeah.
+;
 
 
 ; GENERATE CSS IN THIS SECTION
@@ -22,32 +38,32 @@
 
 ; CSS for the landing page/signin page/login page
 (defn landingcss [] 
-  (cs/defrule h1landing
+  (cs/defrule h1
    [:h1 
     :color darkgreen
     :margin 0
     :font-size "5em"])
 
-  (cs/defrule h2landing
+  (cs/defrule h2
    [:h2
     :color darkgreen
     :margin 0
     :font-size "4em"])
 
-  (cs/defrule bodylanding
+  (cs/defrule body
    [:body
     :background-color lightgreen
     :margin 0
     :padding 0
     :font-family font-family])
 
- (cs/defrule contentlanding
+ (cs/defrule content
   [:.content
    :display "block"
    :margin-left "15%"
    :margin-top "10%"])
 
-  (cs/defrule linklanding
+  (cs/defrule links
    [:a
     :text-decoration "none"
     :color darkblue
@@ -83,8 +99,8 @@
 (defn landing-page [] 
   (view-layout "" (landingcss) ; first arg is page title ;second is css
       [:div {:class "content"}
-      [:h1 {:class "isinviteonly" :style "display:inline" } "theknown.net "]
-      [:h2 {:class "isinviteonly"} "is invite-only"]
+      [:h1 {:style "display:inline" } "theknown.net "]
+      [:h2 {:style "display:inline" }"is invite-only"]
       [:br][:a {:style "position:absolute; bottom:14%" :href "sign-in"} "I have an account or an invitation." ]]))
 
 
