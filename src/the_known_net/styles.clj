@@ -1,4 +1,4 @@
-(ns the-known-net.css
+(ns the-known-net.styles
     (:require [clj-style.core :as cs]))
 
 ; GENERATE CSS IN THIS SECTION
