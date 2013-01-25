@@ -1,5 +1,6 @@
 (ns the-known-net.core
   ; ":use" is deprecated / discouraged
+
     (:require [compojure.route :as route]
               [compojure.core :refer :all]
               [compojure.response :refer :all]
@@ -12,7 +13,7 @@
               [sandbar.core :refer :all]
               [sandbar.auth :refer [with-security]]
               [sandbar.stateful-session :refer [wrap-stateful-session]]
-              [the-known-net.styles :refer :all]
+              [the-known-net.css :refer :all]
               ))
 
 ; WELCOME TO THEKNOWN.NET'S SOURCE CODE
@@ -125,10 +126,12 @@
     (route/not-found (notfounderror-page)) ; TODO: IMPLEMENT 404 PAGE
 )
 
+(comment
 (defn app
     (-> tkn-routes
       (with-security authenticate)
       wrap-stateful-session))
+)
 
 ;run the server
 (defn start-server []
