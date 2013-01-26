@@ -23,9 +23,8 @@
 ; 
 ; 1) Right now everything is in this file. Eventually, things should be broken up.
 ;    It's going to get unwieldy -fast-. We should discuss how best to do this.
-;
-; 2) Below we have some CSS that should do for the landing page and the sign-in/up page and any error pages.
-; 2.1) moved css to css.clj BOOYAH
+; 1.1) we'll want to follow MVC or MVP (google, yo) and break up our sorce based on that
+;      ie: model is 1 file, presenter is 1 file, view is 1 file.. or something...
 ;
 ; 3) We also have routes for those pages.
 ; 4) POST and shit aren't implemented yet.
@@ -70,6 +69,9 @@
 
 ; TODO we'll need to refactor a lot of our page generation, "seeing patterns" in code
 ; means we're not abstracting / breaking things down enough
+
+; DRY (Don't Repeat Yourself) vs. WET (Write Everything Twice) :P
+
 ; right now the pattern follows:
 ; (defn new-page []
 ;    (view-layout <title> <css> <querytype>
