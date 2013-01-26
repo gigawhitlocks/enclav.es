@@ -34,7 +34,7 @@
  (cs/defrule content
   [:.content
    :display "block"
-   :margin-left "15%"
+   :margin-left "10%"
    :margin-top "10%"])
 
   (cs/defrule links
