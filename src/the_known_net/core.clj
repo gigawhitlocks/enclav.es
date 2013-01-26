@@ -11,8 +11,8 @@
               [sandbar.auth :refer :all]
               [sandbar.form-authentication :refer :all]
               [sandbar.validation :refer :all]
-              [hiccup.core :refer :all]
-              [hiccup.page :refer :all]
+              [hiccup.core :refer :all] ; NOTE: we'll eventually most probably refactor to Enlive
+              [hiccup.page :refer :all] ; It's still worth it to be using hiccup now
               [hiccup.element :refer [link-to]]
               [the-known-net.styles :refer :all]))
 
@@ -23,7 +23,7 @@
 ; 
 ; 1) Right now everything is in this file. Eventually, things should be broken up.
 ;    It's going to get unwieldy -fast-. We should discuss how best to do this.
-; 1.1) we'll want to follow MVC or MVP (google, yo) and break up our sorce based on that
+; 1.1) we'll want to follow MVC or MVP (Model View Presenter) and break up our sorce based on that
 ;      ie: model is 1 file, presenter is 1 file, view is 1 file.. or something...
 ;
 ; 3) We also have routes for those pages.
@@ -69,6 +69,7 @@
 
 ; TODO we'll need to refactor a lot of our page generation, "seeing patterns" in code
 ; means we're not abstracting / breaking things down enough
+; I imagine this is where a macro would come in handy
 
 ; DRY (Don't Repeat Yourself) vs. WET (Write Everything Twice) :P
 
@@ -79,7 +80,7 @@
 ;          content)))
 
 ; all data-view is doing is adding a div around any content, which is necessary
-; right now page-404's centering borks if it's inside a "content" div.. some css issues...
+; right now page-404's centering borks if it's inside a "content" div.. these are largely css issues.
 (defn data-view [& content]
   [:div {:class "content"}
       content])
