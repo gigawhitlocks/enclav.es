@@ -1,8 +1,8 @@
 (ns the-known-net.core
   ; ":use" is deprecated / discouraged
     (:require [compojure.route :as route]
-              [compojure.core :refer :all]
-              [compojure.response :refer :all]
+              [compojure.core :refer [defroutes GET]]
+              [compojure.response]
               [ring.adapter.jetty :refer [run-jetty]]
               [ring.util.response :refer :all]
               [ring.middleware.reload :refer :all]
