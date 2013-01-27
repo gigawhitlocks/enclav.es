@@ -5,9 +5,9 @@
       [[org.clojure/clojure "1.4.0"]
             [ring "1.1.8"]
             [ring/ring-devel "1.1.0"]
-            [hiccup "1.0.2"]
-            [sandbar/sandbar "0.4.0-SNAPSHOT"]
             [compojure "1.1.5"]
+            [hiccup "1.0.2"]
+            [org.clojars.cjschroed/sandbar "0.4.3"]
             [korma "0.3.0-RC2"] 
             [clj-style "1.0.1"]]
     :dev-dependencies

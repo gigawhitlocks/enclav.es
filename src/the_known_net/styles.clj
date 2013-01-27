@@ -3,12 +3,11 @@
 
 ; GENERATE CSS IN THIS SECTION
 
-;CSS colors
-(def darkgreen "#12795D")
-(def lightgreen "#88DDC5")
 (def font-family "quattrocento-sans,Helvetica,Arial,sans-serif")
-(def darkblue "#164379")
-
+(def darkgreen "#006633")
+(def lightgreen "#66CC99")
+(def darkblue "#003366")
+(def red "#CC3333")
 
 ; CSS for the landing page/signin page/login page
 (defn landingcss [] 
@@ -22,7 +21,7 @@
    [:h2
     :color darkgreen
     :margin 0
-    :font-size "4em"])
+    :font-size "3.5em"])
 
   (cs/defrule body
    [:body

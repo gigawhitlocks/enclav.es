@@ -6,15 +6,18 @@
               [ring.adapter.jetty :refer [run-jetty]]
               [ring.util.response :refer :all]
               [ring.middleware.reload :refer :all]
+              [ring.middleware.file :refer [wrap-file]]
               [sandbar.core :refer :all]
               [sandbar.stateful-session :refer :all]
               [sandbar.auth :refer :all]
+              [sandbar.forms2 :refer :all]
               [sandbar.form-authentication :refer :all]
               [sandbar.validation :refer :all]
               [hiccup.core :refer :all] ; NOTE: we'll eventually most probably refactor to Enlive
               [hiccup.page :refer :all] ; It's still worth it to be using hiccup now
               [hiccup.element :refer [link-to]]
-              [the-known-net.styles :refer :all]))
+              [the-known-net.styles :refer :all]
+              ))
 
 ; WELCOME TO THEKNOWN.NET'S SOURCE CODE
 
@@ -34,19 +37,14 @@
 ; GENERATE HTML IN THIS SECTION
 
 ; Generates the title string for a page
-
-; what ian wrote
-;(defn maketitle [input]
-;  (if (identical? input "")
-;    (str "theknown.net")
-;    (str "theknown.net | " input)))
-; TODO delete this after you understand the new version
-
-;simpler version using pattern matching
 (defn maketitle 
   ([]      (str "theknown.net"))
   ([input] (str "theknown.net | " input)))
 
+(defn query [type]
+  (ensure-any-role-if (= type :admin-only) #{:admin}
+                      (= type :member-only) #{:member}
+                      (str (name type) " data")))
 
 ; Generates HTML for any page  
 (defn view-layout [ title css querytype & content ]
@@ -58,13 +56,21 @@
                  [:style {:type "text/css"} css ]]
           [:body 
            content
-            
-(comment ;this should put a login link on every page if a user is logged in, but isn't working for some reason (TODO)
-              [:div (if-let [username (current-username)]
-                        (str "You are logged in as " username ". ")
-                        (link-to "logout" "Logout"))]
+(comment ; why the crap doesn't this work...
+            [:br]
+            [:div
+             (cond (any-role-granted? :admin)
+                   "If you can see this then you are an admin!"
+                   (any-role-granted? :member)
+                   "If you can see this then you are a member!"
+                   :else "Click on one of the links above to log in.")]
+            [:div (if (any-role-granted? :user :admin)
+                    [:div 
+                      (str "You are logged in as " (current-username) ". ")
+                      (link-to "/logout" "Logout")])]
 )
            ])))
+
 
 
 ; TODO we'll need to refactor a lot of our page generation, "seeing patterns" in code
@@ -85,44 +91,43 @@
   [:div {:class "content"}
       content])
 
+(defn title-view [& content] ; similar to data-view, but adds the site's generic title
+  [:div {:class "content"}
+      [:h1 {:style "display:inline" } "theknown.net "]
+      content])
+
 ;Generates the site's landing page
 (defn landing-page [] 
   (view-layout "Welcome" (landingcss) (query :public) ; first arg is page title, 2nd is css, 3rd is auth querytype
       [:div {:class "content"}
               [:h1 {:style "display:inline" } "theknown.net "]
               [:h2 {:style "display:inline" } "is invite-only"]
-              [:div (link-to "home" "Home")]
               [:div {:style "position:absolute; bottom:14%"} (link-to "sign-in" "I have an account or an invitation." )]]))
 
 ;Generate the page with the login form and the signup form
 (defn signin-page []
   (view-layout "Sign in / Sign up" (landingcss) (query :public)
-        (data-view 
-          [:div "null"])))
-
-;;;;
-(defn home-view []
-  (view-layout "Home" (landingcss) (query :public)
-        (data-view
+        (title-view 
           [:div (link-to "member" "Member Data")]
-          [:div (link-to "admin"  "Admin Data")])))
+          [:div (link-to "admin"  "Admin Data")]
+          [:div {:style "position:absolute; bottom:14%"} (link-to "/" "Front Page")])))
 
 (defn member-view []
-  (view-layout "Member Page" (landingcss) (query :members-only)
-        (data-view 
+  (view-layout "Member Page" (landingcss) (query :member-only)
+        (title-view 
           [:h2 "Members Only"]
-          [:div (link-to "home" "Home")])))
+          [:div {:style "position:absolute; bottom:14%"} (link-to "/" "Front Page")])))
 
 (defn admin-view []
-  (view-layout "Admin Page" (landingcss) (query :top-secret)
-        (data-view 
+  (view-layout "Admin Page" (landingcss) (query :admin-only)
+        (title-view 
           [:h2 "SECRETS"])))
 
 (defn permission-denied-view []
   (view-layout "Permission Denied" (landingcss) (query :public)
-        (data-view
+        (title-view
           [:h2 "Permission Denied"]
-          [:div (link-to "home" "Home")])))
+          [:div {:style "position:absolute; bottom:14%"} (link-to "/" "Front Page")])))
 
 ;;;;
 ;404 page
@@ -136,33 +141,33 @@
       [:br][:br]
       "FILE NOT FOUND BRO"]]))
 
-;stateful session stuff
-
+; session auth
 (defn authenticate [request]
   (let [uri (:uri request)]
-    (cond (= uri "/member") {:name "joe" :roles #{:member}}
-          (= uri "/admin")  {:name "sue" :roles #{:member}})))
+    (cond (= uri "/member") {:name "member" :roles #{:member}}
+          (= uri "/admin")  {:name "admin" :roles #{:admin}})))
 
-;Routes
+; Routes
 (defroutes tkn-routes
     (GET "/"                  [] (landing-page))
     (GET "/sign-in"           [] (signin-page))
-    (GET "/home"              [] (home-view))
     (GET "/member"            [] (member-view))
     (GET "/admin"             [] (admin-view))
     (GET "/logout"            [] (logout! {}))
     (GET "/permission-denied" [] (permission-denied-view))
     (route/not-found (page-404)))
 
+; Hmm, yes, quite stateful indeed.
 (def app
     (-> tkn-routes
       (with-security authenticate)
-      wrap-stateful-session))
+      wrap-stateful-session
+      ))
 
-; run the server
+; Run the server
 (defn start-server []
     (run-jetty #'the-known-net.core/app {:join? false :port 1337 }))
 
-; main
+; Main
 (defn -main []
     (start-server))
