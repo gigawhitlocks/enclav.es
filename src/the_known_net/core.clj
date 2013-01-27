@@ -41,6 +41,7 @@
   ([]      (str "theknown.net"))
   ([input] (str "theknown.net | " input)))
 
+; Protects a page based on its querytype
 (defn query [type]
   (ensure-any-role-if (= type :admin-only) #{:admin}
                       (= type :member-only) #{:member}
@@ -129,7 +130,6 @@
           [:h2 "Permission Denied"]
           [:div {:style "position:absolute; bottom:14%"} (link-to "/" "Front Page")])))
 
-;;;;
 ;404 page
 (defn page-404 [] ; renamed because "notfounderror-page" is unwieldy
   (view-layout "Page Not Found" (landingcss) (query :public)
