@@ -102,7 +102,7 @@
 (defn landing-page [] 
   (view-layout "Welcome" (landingcss) (query :public) ; first arg is page title, 2nd is css, 3rd is auth querytype
       [:div {:class "content"}
-              [:h1 {:style "display:inline" } "theknown.net "]
+              [:h1 {:style "display:inline" } "cluster.im "]
               [:h2 {:style "display:inline" } "is invite-only"]
               [:div {:style "position:absolute; bottom:14%"} (link-to "sign-in" "I have an account or an invitation." )]]))
 
