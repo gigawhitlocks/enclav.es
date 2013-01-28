@@ -1,4 +1,4 @@
-(defproject the-known-net "0.0.1"
+(defproject cluster "0.0.1"
     :description "An experimental online meta-community."
     :plugins [[lein-ring "0.8.2"]]
     :dependencies
@@ -14,7 +14,7 @@
     :dev-dependencies
       [[lein-run "1.0.0-SNAPSHOT"]
        [lein-diagnosics "0.0.1"]]
-    :ring {:handler the-known-net.core/app
+    :ring {:handler cluster.core/app
            :auto-reload? true
            :auto-refresh? true}
     ; jvm tweaks mostly borrowed from Overtone's project.clj
@@ -27,4 +27,4 @@
                "-XX:MaxNewSize=256m"
                "-XX:NewSize=257m"
                ]
-    :main the-known-net.core)
+    :main cluster.core)
