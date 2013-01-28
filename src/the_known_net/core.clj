@@ -17,6 +17,7 @@
               [hiccup.page :refer :all] ; It's still worth it to be using hiccup now
               [hiccup.element :refer [link-to]]
               [the-known-net.styles :refer :all]
+              [the-known-net.users :refer :all]
               ))
 
 ; WELCOME TO THEKNOWN.NET'S SOURCE CODE
