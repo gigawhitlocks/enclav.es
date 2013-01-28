@@ -9,6 +9,7 @@
             [hiccup "1.0.2"]
             [org.clojars.cjschroed/sandbar "0.4.3"]
             [korma "0.3.0-RC2"] 
+            [postgresql "9.1-901.jdbc4"]
             [clj-style "1.0.1"]]
     :dev-dependencies
       [[lein-run "1.0.0-SNAPSHOT"]
