@@ -16,8 +16,8 @@
               [hiccup.core :refer :all] ; NOTE: we'll eventually most probably refactor to Enlive
               [hiccup.page :refer :all] ; It's still worth it to be using hiccup now
               [hiccup.element :refer [link-to]]
-              [the-known-net.styles :refer :all]
-              [the-known-net.users :refer :all]
+              [cluster.styles :refer :all]
+              [cluster.users :refer :all]
               ))
 
 ; WELCOME TO THEKNOWN.NET'S SOURCE CODE
@@ -95,7 +95,7 @@
 
 (defn title-view [& content] ; similar to data-view, but adds the site's generic title
   [:div {:class "content"}
-      [:h1 {:style "display:inline" } "theknown.net "]
+      [:h1 {:style "display:inline" } "cluster.im "]
       content])
 
 ;Generates the site's landing page
@@ -149,7 +149,7 @@
           (= uri "/admin")  {:name "admin" :roles #{:admin}})))
 
 ; Routes
-(defroutes tkn-routes
+(defroutes cluster-routes
     (GET "/"                  [] (landing-page))
     (GET "/sign-in"           [] (signin-page))
     (GET "/member"            [] (member-view))
@@ -160,7 +160,7 @@
 
 ; Hmm, yes, quite stateful indeed.
 (def app
-    (-> tkn-routes
+    (-> cluster-routes
       (with-security authenticate)
       wrap-stateful-session
       ))

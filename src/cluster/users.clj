@@ -1,6 +1,6 @@
 (ns cluster.users
   (:require [korma.core :refer :all]
-            [the-known-net.db :refer :all]))
+            [cluster.db :refer :all]))
 
 
 (defentity email)
