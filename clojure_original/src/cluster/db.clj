@@ -4,7 +4,7 @@
 
 (defdb devel (postgres {:db "clusterim-devel"
                         :user "clusterim"
-                        :password "ducks love our password"
+                        :password "54WER12cpdjfu%$@"
                         :host "localhost"
                         :port "5432"
                         :delimiters ""
