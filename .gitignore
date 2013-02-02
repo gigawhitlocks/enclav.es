@@ -1,4 +1,6 @@
-/target
+clojure_original/target
 .*.un~
 .*.swp
 /src/the_known_net/db.clj
+.lein-repl-history
+__pycache__
