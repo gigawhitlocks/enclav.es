@@ -28,6 +28,7 @@ class MainHandler(tornado.web.RequestHandler):
 		#self.write(template.render())
 
 def main():
+	tornado.options.parse_command_line()
 	http_server = tornado.httpserver.HTTPServer(Application())
 	http_server.listen(options.port)
 	tornado.ioloop.IOLoop.instance().start()
