@@ -1,7 +1,1 @@
-ian@relay the_known_net $ git remote rm origin
-ian@relay the_known_net $ git remote add origin ssh://git@bitbucket.org/thewhitlockian/cluster.im.git
-
-
-^
-
-DO THAT TO UPDATE THE REPO TO THE NEW NAME
+NOW SUDDENLY PYTHON
