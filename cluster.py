@@ -1,6 +1,7 @@
 # vim: set ts=4 sw=4 noet
 
 import tornado.auth
+import tornado.autoreload
 import tornado.escape
 import tornado.httpserver
 import tornado.ioloop
@@ -24,8 +25,8 @@ class Application(tornado.web.Application):
 
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
-		self.write("hello world!")
-		#self.write(template.render())
+		#self.write("hello world!")
+		self.write(template.render())
 
 def main():
 	tornado.options.parse_command_line()
@@ -34,4 +35,5 @@ def main():
 	tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":
+	tornado.autoreload.start()
 	main()
