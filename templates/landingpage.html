@@ -2,7 +2,7 @@
 <html>
 	<head>
 
-		<title></title>
+		<title>Cluster.im</title>
 		<style type="text/css">
 			body {margin: 0; padding: 0;}
 			div.black {margin: 0; padding: 0; 
@@ -36,6 +36,7 @@
 		<script type='text/javascript'>
 			$("document").ready(function() {
 				$('#scroll').click(function(){  
+					window.history.pushState("Sign-in","Sign In","/#sign-in");
 					$('html, body').animate({ scrollTop: $('#sign-in').offset().top }, 500);
 					return false;
 				});	
@@ -76,6 +77,7 @@
 			</p>
 		</div>
 
+		<a link="#sign-in"></a>
 		<div class="white" id="sign-in" action="index.html" method="post">
 			<form id="login">
 			<p class="black">
