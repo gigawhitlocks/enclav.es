@@ -35,6 +35,8 @@
 			type='text/javascript'></script>
 		<script type='text/javascript'>
 			$("document").ready(function() {
+
+				/* NAVIGATION */
 				$('#scroll').click(function(){  
 					window.history.pushState("Sign-in","Sign In","/#sign-in");
 					$('html, body').animate({ scrollTop: $('#sign-in').offset().top }, 500);
@@ -44,6 +46,15 @@
 					$('html, body').animate({ scrollTop: $('#three').offset().top }, 500);
 					return false;
 				});	
+				$('#goback').click(function(){  
+					$('html, body').animate({ scrollTop: $('#top').offset().top }, 500);
+					return false;
+				});	
+				/***************/
+
+				
+				/* ACTION HANDLERS FOR SIGNIN/UP FORMS */
+				/*** THESE LET YOU SUBMIT W/ ENTER KEY **/
 				$("#password").keypress(function(event) {
 				    if (event.which == 13) {
 					     	event.preventDefault();
@@ -56,11 +67,6 @@
 					        $("#inviteform").submit();
 					}
 				});
-				$('#goback').click(function(){  
-					$('html, body').animate({ scrollTop: $('#top').offset().top }, 500);
-					return false;
-				});	
-
 			});
 		
 		</script>
@@ -77,21 +83,20 @@
 			</p>
 		</div>
 
-		<a link="#sign-in"></a>
-		<div class="white" id="sign-in" action="index.html" method="post">
-			<form id="login">
+		<div class="white" id="sign-in"> 
+			<form id="login" action="/login" method="post" >
 			<p class="black">
 				Sign In<br />
-				username: <input type="text"><br />
-				password: <input id="password" type="password"></p>
+				username: <input name="sign-in" type="text"><br />
+				password: <input name="sign-in" id="password" type="password"></p>
 			</form>
-			<form id="inviteform">
+			<form id="inviteform" action="/sign-up" method="post">
 			<p class="black">
 				<br />
 				or enter your invitation code<br />
-				<input id="invitecode" type="text"><br />
+				<input id="invitecode" name="invitecode" type="text"><br />
 				<br />
-			<a href="#" id="nocode">Don't have an account or invitation?</a>
+				<a href="#" id="nocode">Don't have an account or invitation?</a>
 			</p>
 			</form>
 		</div>

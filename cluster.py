@@ -18,6 +18,8 @@ class Application(tornado.web.Application):
 	def __init__(self):
 		handlers = [
 				(r"/", MainHandler),
+				(r"/sign-up", InviteHandler),
+				(r"/login", LoginHandler)
 		]
 		tornado.web.Application.__init__(self, handlers)
 
@@ -27,6 +29,16 @@ class MainHandler(tornado.web.RequestHandler):
 		template = env.get_template('landingpage.html')
 		self.write(template.render())
 		#self.write("hello world!")
+
+class LoginHandler(tornado.web.RequestHandler):
+	def post(self):
+		if not self.user.is_logged_in():
+			raise tornado.web.HTTPError(403)			
+
+class InviteHandler(tornado.web.RequestHandler):
+	def post(self):
+		self.set_header("Content-Type","text/plain")
+		self.write("The invitation code you entered was "+self.get_argument("invitecode"))
 
 def main():
 	tornado.options.parse_command_line()
