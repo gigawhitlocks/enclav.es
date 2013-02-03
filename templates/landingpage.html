@@ -16,12 +16,12 @@
 				background-color:#DDDDDD; height: 100%;padding-top:10%}
 
 
-			p.white {font-size:3em; color: #DDDDDD; padding-left: 0; padding-right: 0;
+			p.white {font-size:2.0em; color: #DDDDDD; padding-left: 0; padding-right: 0;
 			       	margin-top: 0; 
 				margin-left: auto; margin-right: auto; width: 75%; text-align: center;
 				font-family: Arial,sans-serif; font-style: bold; font-variant: small-caps;}
 
-			p.black {font-size:3em; color: #333333; padding-left: 0; padding-right: 0;
+			p.black {font-size:2.0em; color: #333333; padding-left: 0; padding-right: 0;
 			       	margin-top: 0; 
 				margin-left: auto; margin-right: auto; width: 75%; text-align: center;
 				font-family: Arial,sans-serif; font-style: bold; font-variant: small-caps;}
@@ -55,6 +55,10 @@
 					        $("#inviteform").submit();
 					}
 				});
+				$('#goback').click(function(){  
+					$('html, body').animate({ scrollTop: $('#top').offset().top }, 500);
+					return false;
+				});	
 
 			});
 		
@@ -63,16 +67,19 @@
 	
 	</head>
 	<body>
-		<div class="black" >
+		<div class="black" id="top" >
 			<p class="white">
 			Welcome to Cluster<br /></p>
 
 			<p class="white" style="margin-top:22%">
-			<a href="#sign-in" id="scroll" >Scroll</a></p></div>
+			<a href="#sign-in" id="scroll" >Scroll</a>
+			</p>
+		</div>
+
 		<div class="white" id="sign-in" action="index.html" method="post">
 			<form id="login">
 			<p class="black">
-				Sign in<br />
+				Sign In<br />
 				username: <input type="text"><br />
 				password: <input id="password" type="password"></p>
 			</form>
@@ -86,8 +93,12 @@
 			</p>
 			</form>
 		</div>
+
 		<div class="black" id="three">
-			<p class="white">Maybe you have a friend who can invite you.</p>
+			<p class="white">Maybe you have a friend who can invite you.
+			</br></br>
+			<a href="#" id="goback">go back</a>
+			</p>
 		</div>
 	</body>
 </html>
