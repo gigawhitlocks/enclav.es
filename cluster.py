@@ -11,7 +11,7 @@ import tornado.web
 from jinja2 import Environment, FileSystemLoader
 from tornado.options import define, options
 
-
+env = Environment(loader=FileSystemLoader('templates')) #load ./templates/
 define("port", default=1337, help="run on the given port", type=int)
 
 class Application(tornado.web.Application):
@@ -21,12 +21,12 @@ class Application(tornado.web.Application):
 		]
 		tornado.web.Application.__init__(self, handlers)
 
+
 class MainHandler(tornado.web.RequestHandler):
-	env = Environment(loader=FileSystemLoader('templates')) #load ./templates/
-	template = env.get_template('landingpage.html')
 	def get(self):
-		#self.write("hello world!")
+		template = env.get_template('landingpage.html')
 		self.write(template.render())
+		#self.write("hello world!")
 
 def main():
 	tornado.options.parse_command_line()
