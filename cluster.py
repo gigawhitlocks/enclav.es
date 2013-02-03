@@ -35,5 +35,8 @@ def main():
 	tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":
+ 	#watch for changes and reload the server
+	tornado.autoreload.watch('templates/landingpage.html')
 	tornado.autoreload.start()
+
 	main()
