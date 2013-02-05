@@ -34,12 +34,19 @@ class Application(tornado.web.Application):
 		]
 		tornado.web.Application.__init__(self, handlers,**settings)
 
-#handles the unauthorized landing page
 class LandingPageHandler(tornado.web.RequestHandler):
+		
+	# handles GET requests sent to /
 	def get(self):
-		landingpage_template = env.get_template('landingpage.html')
-		self.write(landingpage_template.render())
-	
+		if(self.get_current_user() == None):
+			## we aren't logged in; load the landing page:
+			landingpage_template = env.get_template('landingpage.html')
+			self.write(landingpage_template.render())
+		else:
+			## a user is logged in
+			self.set_header("Content-Type","text/plain")
+			self.write("The current user is "+self.get_current_user())
+
 	def get_current_user(self):
 		return self.session['user'] if self.session and 'user' in self.session else None
  
@@ -48,9 +55,16 @@ class LandingPageHandler(tornado.web.RequestHandler):
 		sessionid = self.get_secure_cookie('sid')
 		return Session(self.application.session_store, sessionid)
 
+	# handles POST requests sent to /
 	def post(self):
 		if (self.get_current_user() == None):
-			raise tornado.web.HTTPError(403)			
+			raise tornado.web.HTTPError(403)
+			## instead of raising an error, we should authenticate here
+			## with the information passed via POST
+
+		## else we're already logged in		
+			## in this case we're probably handling a POST from a different form
+			## and we can deal with that as needed	
 
 class InviteHandler(tornado.web.RequestHandler):
 	def post(self):
