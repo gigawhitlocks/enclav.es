@@ -7,9 +7,11 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import redis
 
 from tornado.options import define, options
-from jinja2 import Environment, FileSystemLoader 
+from jinja2 import Environment, FileSystemLoader
+from session import * 
 
 #load ./templates/
 env = Environment(loader=FileSystemLoader('templates')) 
@@ -20,22 +22,34 @@ define("port", default=1337, help="run on the given port", type=int)
 #handles routes
 class Application(tornado.web.Application):
 	def __init__(self):
+		settings = {
+			'cookie_secret': "MY MOTHERFUCKING COOKIE SECRET IS SO GOOD AND TASTY"
+		}
+		self.redis = redis.StrictRedis()
+		self.session_store = RedisSessionStore(self.redis)
+
 		handlers = [
 				(r"/", LandingPageHandler),
-				(r"/sign-up", InviteHandler),
-				(r"/login", LoginHandler)
+				(r"/sign-up", InviteHandler)
 		]
-		tornado.web.Application.__init__(self, handlers)
+		tornado.web.Application.__init__(self, handlers,**settings)
 
 #handles the unauthorized landing page
 class LandingPageHandler(tornado.web.RequestHandler):
 	def get(self):
 		landingpage_template = env.get_template('landingpage.html')
 		self.write(landingpage_template.render())
+	
+	def get_current_user(self):
+		return self.session['user'] if self.session and 'user' in self.session else None
+ 
+	@property
+	def session(self):
+		sessionid = self.get_secure_cookie('sid')
+		return Session(self.application.session_store, sessionid)
 
-class LoginHandler(tornado.web.RequestHandler):
 	def post(self):
-		if not self.user.is_logged_in():
+		if (self.get_current_user() == None):
 			raise tornado.web.HTTPError(403)			
 
 class InviteHandler(tornado.web.RequestHandler):
