@@ -8,27 +8,30 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 
-from jinja2 import Environment, FileSystemLoader
 from tornado.options import define, options
+from jinja2 import Environment, FileSystemLoader 
 
-env = Environment(loader=FileSystemLoader('templates')) #load ./templates/
-define("port", default=1337, help="run on the given port", type=int)
+#load ./templates/
+env = Environment(loader=FileSystemLoader('templates')) 
 
+#define port for the server to run on
+define("port", default=1337, help="run on the given port", type=int) 
+
+#handles routes
 class Application(tornado.web.Application):
 	def __init__(self):
 		handlers = [
-				(r"/", MainHandler),
+				(r"/", LandingPageHandler),
 				(r"/sign-up", InviteHandler),
 				(r"/login", LoginHandler)
 		]
 		tornado.web.Application.__init__(self, handlers)
 
-
-class MainHandler(tornado.web.RequestHandler):
+#handles the unauthorized landing page
+class LandingPageHandler(tornado.web.RequestHandler):
 	def get(self):
-		template = env.get_template('landingpage.html')
-		self.write(template.render())
-		#self.write("hello world!")
+		landingpage_template = env.get_template('landingpage.html')
+		self.write(landingpage_template.render())
 
 class LoginHandler(tornado.web.RequestHandler):
 	def post(self):
@@ -46,6 +49,7 @@ def main():
 	http_server.listen(options.port)
 	tornado.ioloop.IOLoop.instance().start()
 
+#start everything up
 if __name__ == "__main__":
  	#watch for changes and reload the server
 	tornado.autoreload.watch('templates/landingpage.html')
