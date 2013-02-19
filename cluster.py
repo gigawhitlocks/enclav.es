@@ -7,26 +7,69 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import redis
 
-from jinja2 import Environment, FileSystemLoader
 from tornado.options import define, options
+from jinja2 import Environment, FileSystemLoader
+from session import * 
 
+#load ./templates/
+env = Environment(loader=FileSystemLoader('templates')) 
 
-define("port", default=1337, help="run on the given port", type=int)
+#define port for the server to run on
+define("port", default=1337, help="run on the given port", type=int) 
 
+#handles routes
 class Application(tornado.web.Application):
 	def __init__(self):
-		handlers = [
-				(r"/", MainHandler),
-		]
-		tornado.web.Application.__init__(self, handlers)
+		settings = {
+			'cookie_secret': "MY MOTHERFUCKING COOKIE SECRET IS SO GOOD AND TASTY"
+		}
+		self.redis = redis.StrictRedis()
+		self.session_store = RedisSessionStore(self.redis)
 
-class MainHandler(tornado.web.RequestHandler):
-	env = Environment(loader=FileSystemLoader('templates')) #load ./templates/
-	template = env.get_template('landingpage.html')
+		handlers = [
+				(r"/", LandingPageHandler),
+				(r"/sign-up", InviteHandler)
+		]
+		tornado.web.Application.__init__(self, handlers,**settings)
+
+class LandingPageHandler(tornado.web.RequestHandler):
+		
+	# handles GET requests sent to /
 	def get(self):
-		#self.write("hello world!")
-		self.write(template.render())
+		if(self.get_current_user() == None):
+			## we aren't logged in; load the landing page:
+			landingpage_template = env.get_template('landingpage.html')
+			self.write(landingpage_template.render())
+		else:
+			## a user is logged in
+			self.set_header("Content-Type","text/plain")
+			self.write("The current user is "+self.get_current_user())
+
+	def get_current_user(self):
+		return self.session['user'] if self.session and 'user' in self.session else None
+ 
+	@property
+	def session(self):
+		sessionid = self.get_secure_cookie('sid')
+		return Session(self.application.session_store, sessionid)
+
+	# handles POST requests sent to /
+	def post(self):
+		if (self.get_current_user() == None):
+			raise tornado.web.HTTPError(403)
+			## instead of raising an error, we should authenticate here
+			## with the information passed via POST
+
+		## else we're already logged in		
+			## in this case we're probably handling a POST from a different form
+			## and we can deal with that as needed	
+
+class InviteHandler(tornado.web.RequestHandler):
+	def post(self):
+		self.set_header("Content-Type","text/plain")
+		self.write("The invitation code you entered was "+self.get_argument("invitecode"))
 
 def main():
 	tornado.options.parse_command_line()
@@ -34,6 +77,10 @@ def main():
 	http_server.listen(options.port)
 	tornado.ioloop.IOLoop.instance().start()
 
+#start everything up
 if __name__ == "__main__":
+ 	#watch for changes and reload the server
+	tornado.autoreload.watch('templates/landingpage.html')
 	tornado.autoreload.start()
+
 	main()

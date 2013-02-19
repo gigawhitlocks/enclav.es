@@ -2,7 +2,7 @@
 <html>
 	<head>
 
-		<title></title>
+		<title>Cluster.im</title>
 		<style type="text/css">
 			body {margin: 0; padding: 0;}
 			div.black {margin: 0; padding: 0; 
@@ -16,12 +16,12 @@
 				background-color:#DDDDDD; height: 100%;padding-top:10%}
 
 
-			p.white {font-size:3em; color: #DDDDDD; padding-left: 0; padding-right: 0;
+			p.white {font-size:2.0em; color: #DDDDDD; padding-left: 0; padding-right: 0;
 			       	margin-top: 0; 
 				margin-left: auto; margin-right: auto; width: 75%; text-align: center;
 				font-family: Arial,sans-serif; font-style: bold; font-variant: small-caps;}
 
-			p.black {font-size:3em; color: #333333; padding-left: 0; padding-right: 0;
+			p.black {font-size:2.0em; color: #333333; padding-left: 0; padding-right: 0;
 			       	margin-top: 0; 
 				margin-left: auto; margin-right: auto; width: 75%; text-align: center;
 				font-family: Arial,sans-serif; font-style: bold; font-variant: small-caps;}
@@ -35,7 +35,10 @@
 			type='text/javascript'></script>
 		<script type='text/javascript'>
 			$("document").ready(function() {
+
+				/* NAVIGATION */
 				$('#scroll').click(function(){  
+					window.history.pushState("Sign-in","Sign In","/#sign-in");
 					$('html, body').animate({ scrollTop: $('#sign-in').offset().top }, 500);
 					return false;
 				});	
@@ -43,6 +46,15 @@
 					$('html, body').animate({ scrollTop: $('#three').offset().top }, 500);
 					return false;
 				});	
+				$('#goback').click(function(){  
+					$('html, body').animate({ scrollTop: $('#top').offset().top }, 500);
+					return false;
+				});	
+				/***************/
+
+				
+				/* ACTION HANDLERS FOR SIGNIN/UP FORMS */
+				/*** THESE LET YOU SUBMIT W/ ENTER KEY **/
 				$("#password").keypress(function(event) {
 				    if (event.which == 13) {
 					     	event.preventDefault();
@@ -55,7 +67,6 @@
 					        $("#inviteform").submit();
 					}
 				});
-
 			});
 		
 		</script>
@@ -63,31 +74,38 @@
 	
 	</head>
 	<body>
-		<div class="black" >
+		<div class="black" id="top" >
 			<p class="white">
 			Welcome to Cluster<br /></p>
 
 			<p class="white" style="margin-top:22%">
-			<a href="#sign-in" id="scroll" >Scroll</a></p></div>
-		<div class="white" id="sign-in" action="index.html" method="post">
-			<form id="login">
+			<a href="#sign-in" id="scroll" >Scroll</a>
+			</p>
+		</div>
+
+		<div class="white" id="sign-in"> 
+			<form id="login" action="/login" method="post" >
 			<p class="black">
-				Sign in<br />
-				username: <input type="text"><br />
-				password: <input id="password" type="password"></p>
+				Sign In<br />
+				username: <input name="sign-in" type="text"><br />
+				password: <input name="sign-in" id="password" type="password"></p>
 			</form>
-			<form id="inviteform">
+			<form id="inviteform" action="/sign-up" method="post">
 			<p class="black">
 				<br />
 				or enter your invitation code<br />
-				<input id="invitecode" type="text"><br />
+				<input id="invitecode" name="invitecode" type="text"><br />
 				<br />
-			<a href="#" id="nocode">Don't have an account or invitation?</a>
+				<a href="#" id="nocode">Don't have an account or invitation?</a>
 			</p>
 			</form>
 		</div>
+
 		<div class="black" id="three">
-			<p class="white">Maybe you have a friend who can invite you.</p>
+			<p class="white">Maybe you have a friend who can invite you.
+			</br></br>
+			<a href="#" id="goback">go back</a>
+			</p>
 		</div>
 	</body>
 </html>
