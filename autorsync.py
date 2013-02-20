@@ -25,7 +25,7 @@ if ( sys.argv[1][0] == '~'):
 
 # actually call rsync when an event is called
 def on_loop(notifier):
-	call(["rsync","-davh",sys.argv[1],"miranda.theknown.net:~/"+sys.argv[2]])
+	call(["rsync","-avh","--delete",sys.argv[1],"miranda.theknown.net:~/"+sys.argv[2]])
 
 # handle sigterm so that the program shuts down gracefully when killed
 def handle_sigTERM():
