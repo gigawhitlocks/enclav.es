@@ -8,6 +8,6 @@ class User(Node):
 	password = String(nullable=False)
 	created = DateTime(default=current_datetime, nullable=False)
 
-class Friends(Relationship):
-	label = "is friends with"
+class Follows(Relationship):
+	label = "follows"
 	created = DateTime(default=current_datetime, nullable=False)
