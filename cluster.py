@@ -23,7 +23,7 @@ define("port", default=1337, help="run on the given port", type=int)
 class Application(tornado.web.Application):
 	def __init__(self):
 		settings = {
-			'cookie_secret': "MY MOTHERFUCKING COOKIE SECRET IS SO GOOD AND TASTY"
+			'cookie_secret': sha512(str(random())).hexdigest()
 		}
 		self.redis = redis.StrictRedis()
 		self.session_store = RedisSessionStore(self.redis)
