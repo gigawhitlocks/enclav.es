@@ -11,7 +11,9 @@ import redis
 
 from tornado.options import define, options
 from jinja2 import Environment, FileSystemLoader
-from session import * 
+from session import *
+import hashlib
+from random import random
 
 #load ./templates/
 env = Environment(loader=FileSystemLoader('templates')) 
@@ -23,7 +25,7 @@ define("port", default=1337, help="run on the given port", type=int)
 class Application(tornado.web.Application):
 	def __init__(self):
 		settings = {
-			'cookie_secret': sha512(str(random())).hexdigest()
+			'cookie_secret': hashlib.sha512(str(random())).hexdigest()
 		}
 		self.redis = redis.StrictRedis()
 		self.session_store = RedisSessionStore(self.redis)
