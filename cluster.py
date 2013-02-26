@@ -60,7 +60,9 @@ class LandingPageHandler(tornado.web.RequestHandler):
 	# handles POST requests sent to /
 	def post(self):
 		if (self.get_current_user() == None):
-			raise tornado.web.HTTPError(403)
+			self.set_header("Content-Type", "text/plain")
+			self.write("You wrote " + self.get_argument("username"))
+			self.write("You wrote " + self.get_argument("password"))
 			## instead of raising an error, we should authenticate here
 			## with the information passed via POST
 
