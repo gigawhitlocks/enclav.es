@@ -50,8 +50,7 @@ class Session:
         self._store.set_session(
                 self._sessionid,
                 'last_access',
-                pickle.dumps(access_info)
-                )
+                pickle.dumps(access_info))
 
     def last_access(self):
         access_info = self._store.get_session(self._sessionid, 'last_access')

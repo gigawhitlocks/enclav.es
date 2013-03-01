@@ -16,7 +16,7 @@ import hashlib
 from random import random
 
 from bulbs.neo4jserver import Graph
-from users import User
+from users import User, check_password
 
 #load ./templates/
 env = Environment(loader=FileSystemLoader('templates')) 
@@ -28,7 +28,8 @@ define("port", default=1337, help="run on the given port", type=int)
 class Application(tornado.web.Application):
 	def __init__(self):
 		settings = {
-			'cookie_secret': hashlib.sha512(str(random())).hexdigest()
+			'cookie_secret': hashlib.sha512(str(random())).hexdigest(),
+	    "xsrf_cookies": True
 		}
 		self.redis = redis.StrictRedis()
 		self.session_store = RedisSessionStore(self.redis)
@@ -48,6 +49,7 @@ class LandingPageHandler(tornado.web.RequestHandler):
 			## we aren't logged in; load the landing page:
 			landingpage_template = env.get_template('landingpage.html')
 			self.write(landingpage_template.render())
+
 		else:
 			## a user is logged in
 			self.set_header("Content-Type","text/plain")
@@ -63,6 +65,8 @@ class LandingPageHandler(tornado.web.RequestHandler):
 
 	# handles POST requests sent to /
 	def post(self):
+		header_template = env.get_template('header.html')
+		self.write(header_template.render())
 		if (self.get_current_user() == None):
 			# Sets up the graph db
 			graph = Graph()
@@ -73,7 +77,12 @@ class LandingPageHandler(tornado.web.RequestHandler):
 				self.write("No such user exists\n")
 			else :
 				self.write("The userid of "+user.name+" is "+user.userid+"<br />")
-				
+				if check_password(self.get_argument("password"),user.password):
+					self.write("Password was correct")
+				else:
+					self.write("Password was incorrect")
+
+			self.write("<br />")
 			self.write("The username you entered was " + self.get_argument("username") + "<br />")
 			self.write("The password you entered was " + self.get_argument("password") + "<br />")
 			## instead of raising an error, we should authenticate here

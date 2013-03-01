@@ -85,12 +85,14 @@
 
 		<div class="white" id="sign-in"> 
 			<form id="login" action="/" method="post" >
+				<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"> 
 			<p class="black">
 				Sign In<br />
 				username: <input name="username" type="text"><br />
 				password: <input name="password" id="password" type="password"></p>
 			</form>
 			<form id="inviteform" action="/sign-up" method="post">
+				<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"> 
 			<p class="black">
 				<br />
 				or enter your invitation code<br />
