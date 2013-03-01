@@ -29,7 +29,7 @@ class Application(tornado.web.Application):
 	def __init__(self):
 		settings = {
 			'cookie_secret': hashlib.sha512(str(random())).hexdigest(),
-	    "xsrf_cookies": True
+	    "xsrf_cookies": False
 		}
 		self.redis = redis.StrictRedis()
 		self.session_store = RedisSessionStore(self.redis)
@@ -42,7 +42,9 @@ class Application(tornado.web.Application):
 
 
 class LandingPageHandler(tornado.web.RequestHandler):
-		
+	def get_current_user(self):
+		return self.get_secure_cookie("username")
+
 	# handles GET requests sent to /
 	def get(self):
 		if(self.get_current_user() == None):
@@ -55,8 +57,8 @@ class LandingPageHandler(tornado.web.RequestHandler):
 			self.set_header("Content-Type","text/plain")
 			self.write("The current user is "+self.get_current_user())
 
-	def get_current_user(self):
-		return self.session['user'] if self.session and 'user' in self.session else None
+#	def get_current_user(self):
+#		return self.session['user'] if self.session and 'user' in self.session else None
  
 	@property
 	def session(self):
@@ -76,21 +78,20 @@ class LandingPageHandler(tornado.web.RequestHandler):
 			if ( user == None ):
 				self.write("No such user exists\n")
 			else :
-				self.write("The userid of "+user.name+" is "+user.userid+"<br />")
+#				self.write("The userid of "+user.name+" is "+user.userid+"<br />")
 				if check_password(self.get_argument("password"),user.password):
-					self.write("Password was correct")
+#					self.write("Password was correct")
+					self.set_secure_cookie("username", user.name)
+					self.redirect("/")
 				else:
 					self.write("Password was incorrect")
 
-			self.write("<br />")
-			self.write("The username you entered was " + self.get_argument("username") + "<br />")
-			self.write("The password you entered was " + self.get_argument("password") + "<br />")
+#			self.write("<br />")
+#			self.write("The username you entered was " + self.get_argument("username") + "<br />")
+#     self.write("The password you entered was " + self.get_argument("password") + "<br />")
 			## instead of raising an error, we should authenticate here
 			## with the information passed via POST
 
-		## else we're already logged in		
-			## in this case we're probably handling a POST from a different form
-			## and we can deal with that as needed	
 
 class InviteHandler(tornado.web.RequestHandler):
 	def post(self):
