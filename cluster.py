@@ -39,9 +39,6 @@ class Application(tornado.web.Application):
 		]
 		tornado.web.Application.__init__(self, handlers,**settings)
 
-		# Sets up the graph db
-		g = Graph()
-		g.add_proxy("users",User)
 
 class LandingPageHandler(tornado.web.RequestHandler):
 		
@@ -67,16 +64,18 @@ class LandingPageHandler(tornado.web.RequestHandler):
 	# handles POST requests sent to /
 	def post(self):
 		if (self.get_current_user() == None):
-			g = Graph()
-			self.set_header("Content-Type", "text/plain")
-			user = g.users.index.get_unique(name=self.get_argument("username")) 
+			# Sets up the graph db
+			graph = Graph()
+			graph.add_proxy("users",User)
+			self.set_header("Content-Type", "text/html")
+			user = graph.users.index.get_unique(name=self.get_argument("username")) 
 			if ( user == None ):
 				self.write("No such user exists\n")
 			else :
-				self.write(user.uid)
+				self.write("The userid of "+user.name+" is "+user.userid+"<br />")
 				
-			self.write("You wrote " + self.get_argument("username"))
-			self.write("You wrote " + self.get_argument("password"))
+			self.write("The username you entered was " + self.get_argument("username") + "<br />")
+			self.write("The password you entered was " + self.get_argument("password") + "<br />")
 			## instead of raising an error, we should authenticate here
 			## with the information passed via POST
 
