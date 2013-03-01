@@ -28,7 +28,8 @@ define("port", default=1337, help="run on the given port", type=int)
 class Application(tornado.web.Application):
 	def __init__(self):
 		settings = {
-			'cookie_secret': hashlib.sha512(str(random())).hexdigest(),
+			'cookie_secret': "GOTTA HAVE MY COOKIE SECRETE",
+			#'cookie_secret': hashlib.sha512(str(random())).hexdigest(),
 	    "xsrf_cookies": False
 		}
 		self.redis = redis.StrictRedis()
@@ -54,8 +55,10 @@ class LandingPageHandler(tornado.web.RequestHandler):
 
 		else:
 			## a user is logged in
-			self.set_header("Content-Type","text/plain")
-			self.write("The current user is "+self.get_current_user())
+			self.set_header("Content-Type","text/html")
+			header_template = env.get_template('header.html')
+			self.write(header_template.render())
+			self.write('Thank you for logging in, %s.' %self.get_current_user())
 
 	@property
 	def session(self):
