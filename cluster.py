@@ -57,15 +57,13 @@ class LandingPageHandler(tornado.web.RequestHandler):
 			self.set_header("Content-Type","text/plain")
 			self.write("The current user is "+self.get_current_user())
 
-#	def get_current_user(self):
-#		return self.session['user'] if self.session and 'user' in self.session else None
- 
 	@property
 	def session(self):
 		sessionid = self.get_secure_cookie('sid')
 		return Session(self.application.session_store, sessionid)
 
 	# handles POST requests sent to /
+	# Generally these are login requests
 	def post(self):
 		header_template = env.get_template('header.html')
 		self.write(header_template.render())
@@ -73,28 +71,28 @@ class LandingPageHandler(tornado.web.RequestHandler):
 			# Sets up the graph db
 			graph = Graph()
 			graph.add_proxy("users",User)
+
+			# open database and look up input username
 			self.set_header("Content-Type", "text/html")
 			user = graph.users.index.get_unique(name=self.get_argument("username")) 
 			if ( user == None ):
 				self.write("No such user exists\n")
 			else :
-#				self.write("The userid of "+user.name+" is "+user.userid+"<br />")
+
+				# check that password is correct
 				if check_password(self.get_argument("password"),user.password):
-#					self.write("Password was correct")
+
+					# save the session cookie
 					self.set_secure_cookie("username", user.name)
 					self.redirect("/")
 				else:
 					self.write("Password was incorrect")
 
-#			self.write("<br />")
-#			self.write("The username you entered was " + self.get_argument("username") + "<br />")
-#     self.write("The password you entered was " + self.get_argument("password") + "<br />")
-			## instead of raising an error, we should authenticate here
-			## with the information passed via POST
-
 
 class InviteHandler(tornado.web.RequestHandler):
 	def post(self):
+
+		# todo
 		self.set_header("Content-Type","text/plain")
 		self.write("The invitation code you entered was "+self.get_argument("invitecode"))
 
