@@ -37,7 +37,8 @@ class Application(tornado.web.Application):
 
 		handlers = [
 				(r"/", LandingPageHandler),
-				(r"/sign-up", InviteHandler)
+				(r"/sign-up", InviteHandler),
+				(r"/logout", LogoutHandler)
 		]
 		tornado.web.Application.__init__(self, handlers,**settings)
 
@@ -91,6 +92,9 @@ class LandingPageHandler(tornado.web.RequestHandler):
 				else:
 					self.write("Password was incorrect")
 
+class LogoutHandler(tornado.web.RequestHandler):
+	def get(self):
+		self.clear_cookie("username")
 
 class InviteHandler(tornado.web.RequestHandler):
 	def post(self):
