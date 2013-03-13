@@ -41,7 +41,6 @@ wm = pyinotify.WatchManager()
 notifier = pyinotify.Notifier(wm)
 
 # this only watches the current directory.
-# TODO: make this watch child directories also
 wm.add_watch(sys.argv[1], pyinotify.IN_CREATE | pyinotify.IN_DELETE | pyinotify.IN_MODIFY, rec=True, auto_add=True)
 
 
