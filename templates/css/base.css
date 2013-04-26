@@ -51,9 +51,9 @@
 /* #Basic Styles
 ================================================== */
 	body {
-		background: #fff;
+		background: #333;
 		font: 14px/21px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-		color: #444;
+		color: #DDD;
 		-webkit-font-smoothing: antialiased; /* Fix for webkit rendering */
 		-webkit-text-size-adjust: 100%;
  }
