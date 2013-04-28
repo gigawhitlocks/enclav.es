@@ -1,5 +1,9 @@
-An XMPP-based community organized as a graph
+#Cluster.im
+####A meta-community written in Python
 
-1. Install Vagrant (vagrantup.com)
-2. vagrant up
-3. vagrant ssh
+###Want to help out?
+1. Check out the repository.
+2a. Install Vagrant (vagrantup.com) if you do not have it
+2b. vagrant up (this will take awhile)
+3. vagrant ssh to log into the VM
+4. python ~/cluster/cluster.py to start the server on port 1337, forwarded to localhost:1337 on host OS
