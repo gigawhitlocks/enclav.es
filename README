@@ -1,6 +1,5 @@
 An XMPP-based community organized as a graph
 
 1. Install Vagrant (vagrantup.com)
-2. vagrant box add cluster.im http://theknown.net/CentOS-6.4-x86_64-v20130309.box
-3. vagrant up
-4. vagrant ssh
+2. vagrant up
+3. vagrant ssh
