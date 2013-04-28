@@ -1,9 +1,9 @@
 Cluster.im
 ====
-###A meta-community written in Python
+##A meta-community written in Python
 
 
-##Want to help out?
+###Want to help out?
 1. Check out the repository.
 3. Install Vagrant (vagrantup.com) if you do not have it
 4. ```vagrant up``` (this will take awhile)
