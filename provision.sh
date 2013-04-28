@@ -24,4 +24,11 @@ echo "Installing PIP, screen, & Python deps..";
 yum install screen python-pip -y --enablerepo=epel;
 
 # install deps
-pip-python install tornado redis jinja2 bulbs pytz
+pip-python install tornado redis jinja2 bulbs pytz;
+
+# turns off selinux
+echo 0 > /selinux/enforce;
+
+# turns off the firewall TODO: REMOVE THIS AND SET UP THE FIREWALL FO REALZ
+/etc/init.d/iptables stop;
+
