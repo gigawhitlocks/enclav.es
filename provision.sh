@@ -28,19 +28,19 @@ pip-python install tornado redis jinja2 bulbs pytz;
 # turns off selinux
 echo 0 > /selinux/enforce;
 
-echo "Installing & configuring firewall..";
+#echo "Installing & configuring firewall..";
 # install apf & configure firewall
-wget -q http://www.rfxn.com/downloads/apf-current.tar.gz;
-tar xf apf-current.tar.gz;
-cd apf-[0-9]*;
-./install.sh;
+#wget -q http://www.rfxn.com/downloads/apf-current.tar.gz;
+#tar xf apf-current.tar.gz;
+#cd apf-[0-9]*;
+#./install.sh;
 
-# open port 1337
-sed -i.bak s/IG_TCP_CPORTS=\"22\"/IG_TCP_CPORTS=\"22,1337\"/g /etc/apf/conf.apf \
+## open port 1337
+#sed -i.bak s/IG_TCP_CPORTS=\"22\"/IG_TCP_CPORTS=\"22,1337\"/g /etc/apf/conf.apf \
 		&& apf -r;
 
-cd ..;
-rm -f apf-current.tar.gz;
+#cd ..;
+#rm -f apf-current.tar.gz;
 
 echo "Downloading Java..";
 wget -q http://theknown.net/jdk-6u45-linux-x64-rpm.bin;
@@ -56,7 +56,7 @@ wget -q http://theknown.net/neo4j-community-1.8.2-unix.tar.gz;
 echo "Installing Neo4j..";
 tar xf neo4j-community-1.8.2-unix.tar.gz;
 useradd neo4j;
-expect -c 'set timeout 20; spawn "/opt/neo4j-community-1.8.2/bin/neo4j install";\
+expect -c 'set timeout -1; spawn /opt/neo4j-community-1.8.2/bin/neo4j install;\
 	expect "*should run Neo4j?*" { send "neo4j\r" };\
 	interact;';
 
@@ -66,7 +66,7 @@ echo -e "\nsession    required   pam_limits.so\n" >> /etc/pam.d/su;
 
 echo "Starting neo4j...";
 chown -R neo4j.neo4j /opt/neo4j-community-1.8.2;
-su - neo4j -c "/opt/neo4j-community-1.8.2/bin/neo4j start";
+/opt/neo4j-community-1.8.2/bin/neo4j start;
 cd /home/vagrant/;
 
 # Download redis
