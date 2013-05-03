@@ -22,7 +22,7 @@ from users import User, check_password
 env = Environment(loader=FileSystemLoader('templates')) 
 
 #define port for the server to run on
-define("port", default=1337, help="run on the given port", type=int) 
+define("port", default=31337, help="run on the given port", type=int) 
 
 #handles routes
 class Application(tornado.web.Application):
@@ -57,7 +57,7 @@ class LandingPageHandler(tornado.web.RequestHandler):
 		else:
 			## a user is logged in
 			self.set_header("Content-Type","text/html")
-			header_template = env.get_template('base.html')
+			header_template = env.get_template('content.html')
 			self.write(header_template.render())
 	#		self.write('Thank you for logging in, %s.' %self.get_current_user())
 
