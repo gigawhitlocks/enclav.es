@@ -37,7 +37,7 @@ echo 0 > /selinux/enforce;
 
 ## open port 1337
 #sed -i.bak s/IG_TCP_CPORTS=\"22\"/IG_TCP_CPORTS=\"22,1337\"/g /etc/apf/conf.apf \
-		&& apf -r;
+		#&& apf -r;
 
 #cd ..;
 #rm -f apf-current.tar.gz;
