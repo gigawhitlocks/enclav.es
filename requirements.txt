@@ -1,0 +1,13 @@
+Jinja2==2.7
+MarkupSafe==0.18
+PyYAML==3.10
+## FIXME: could not find svn URL in dependency_links for this package:
+bulbs==0.3.14-20130504
+distribute==0.6.34
+httplib2==0.8
+omnijson==0.1.2
+python-dateutil==1.5
+redis==2.7.5
+six==1.3.0
+tornado==3.0.1
+wsgiref==0.1.2
