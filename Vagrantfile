@@ -11,7 +11,8 @@ Vagrant.configure("2") do |config|
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "http://theknown.net/CentOS-6.4-x86_64-v20130309.box"
+#  config.vm.box_url = "http://theknown.net/CentOS-6.4-x86_64-v20130309.box"
+	config.vm.box_url = "https://dl.dropbox.com/u/5721940/vagrant-boxes/vagrant-centos-6.4-x86_64-vmware_fusion.box"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
