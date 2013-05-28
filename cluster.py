@@ -22,7 +22,7 @@ from users import User, check_password
 env = Environment(loader=FileSystemLoader('templates')) 
 
 #define port for the server to run on
-define("port", default=80, help="run on the given port", type=int) 
+define("port", default=8000, help="run on the given port", type=int) 
 
 #handles routes
 class Application(tornado.web.Application):

@@ -23,27 +23,15 @@ echo "Installing extra software from repos..";
 yum install screen python-pip lsof expect -y --enablerepo=epel;
 
 # install deps
-pip-python install tornado redis jinja2 bulbs pytz;
+#pip-python install tornado redis jinja2 bulbs pytz;
+pip-python install -r /home/vagrant/cluster/requirements.txt
+
 
 # turns off selinux
 echo 0 > /selinux/enforce;
 
-#echo "Installing & configuring firewall..";
-# install apf & configure firewall
-#wget -q http://www.rfxn.com/downloads/apf-current.tar.gz;
-#tar xf apf-current.tar.gz;
-#cd apf-[0-9]*;
-#./install.sh;
-
-## open port 1337
-#sed -i.bak s/IG_TCP_CPORTS=\"22\"/IG_TCP_CPORTS=\"22,1337\"/g /etc/apf/conf.apf \
-		#&& apf -r;
-
-#cd ..;
-#rm -f apf-current.tar.gz;
-
 echo "Downloading Java..";
-wget -q http://theknown.net/jdk-6u45-linux-x64-rpm.bin;
+wget -q https://dl.dropboxusercontent.com/u/14943993/jdk-6u45-linux-x64-rpm.bin;
 
 echo "Installing Java..";
 chmod +x jdk-6u45-linux-x64-rpm.bin;
@@ -51,7 +39,7 @@ chmod +x jdk-6u45-linux-x64-rpm.bin;
 
 echo "Downloading Neo4j..";
 cd /opt;
-wget -q http://theknown.net/neo4j-community-1.8.2-unix.tar.gz;
+wget -q https://dl.dropboxusercontent.com/u/14943993/neo4j-community-1.8.1-unix.tar.gz;
 
 echo "Installing Neo4j..";
 tar xf neo4j-community-1.8.2-unix.tar.gz;
@@ -72,7 +60,7 @@ cd /home/vagrant/;
 # Download redis
 
 echo "Installing redis..";
-wget -q http://theknown.net/redis-2.6.9.tar.gz;
+wget -q https://dl.dropboxusercontent.com/u/14943993/redis-2.6.9.tar.gz;
 tar xf redis-[0-9]*;
 cd redis-[0-9]*;
 make;
