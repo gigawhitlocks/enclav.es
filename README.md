@@ -11,7 +11,7 @@ Cluster.im
 6. ```sudo ./postinstall.sh``` and wait for it to complete
 6. ```sudo -i``` to gain root.
 6. ```sh /vagrant/provision.sh``` to run my custom scripts on the VM
-6. ```python ~/cluster/cluster.py``` to start the server on port 1337, forwarded to localhost:1337 on host OS
+6. ```python ~/cluster/cluster.py``` to start the server, forwarded to http://localhost:8080 on host OS
 
 When you're done, run ```vagrant suspend``` to pause the VM, and ```vagrant resume``` to restart it.
 
