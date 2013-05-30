@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# update the system
-echo "Starting full system update...";
-#yum update -y;
-apt-get update -y -q;
-#apt-get upgrade -y -q;
 
-echo "Finished updating. Performing initial setup..";
+# install java
+apt-get install python-software-properties make -y -q;
+add-apt-repository ppa:webupd8team/java;
+apt-get update -y -q;
+apt-get install oracle-java6-installer -y;
+
 
 # symlink the project directory somewhere more convenient
 ln -s /vagrant/ /home/vagrant/cluster;
@@ -32,14 +32,16 @@ pip install -r /home/vagrant/cluster/requirements.txt
 
 
 # turns off selinux
-echo 0 > /selinux/enforce;
+#echo 0 > /selinux/enforce;
 
-echo "Downloading Java..";
-wget -q https://dl.dropboxusercontent.com/u/14943993/jdk-6u45-linux-x64-rpm.bin;
+#echo "Downloading Java..";
+#wget -q https://dl.dropboxusercontent.com/u/14943993/jdk-6u45-linux-x64.bin;
 
-echo "Installing Java..";
-chmod +x jdk-6u45-linux-x64-rpm.bin;
-./jdk-6u45-linux-x64-rpm.bin;
+#echo "Installing Java..";
+#chmod +x jdk-6u45-linux-x64.bin;
+#./jdk-6u45-linux-x64.bin;
+
+
 
 echo "Downloading Neo4j..";
 cd /opt;
@@ -48,13 +50,13 @@ wget -q https://dl.dropboxusercontent.com/u/14943993/neo4j-community-1.8.1-unix.
 echo "Installing Neo4j..";
 tar xf neo4j-community-1.8.1-unix.tar.gz;
 useradd neo4j;
-expect -c 'set timeout -1; spawn /opt/neo4j-community-1.8.1/bin/neo4j install;\
-	expect "*should run Neo4j?*" { send "neo4j\r" };\
-	interact;';
+#expect -c 'set timeout -1; spawn /opt/neo4j-community-1.8.1/bin/neo4j install;\
+#	expect "*should run Neo4j?*" { send "neo4j\r" };\
+#	interact;';
 
 ulimit -n 40000;
-echo -e "\nneo4j   soft    nofile  40000\nneo4j   hard    nofile  40000\n" >> /etc/security/limits.conf;
-echo -e "\nsession    required   pam_limits.so\n" >> /etc/pam.d/su;
+#echo -e "\nneo4j   soft    nofile  40000\nneo4j   hard    nofile  40000\n" >> /etc/security/limits.conf;
+#echo -e "\nsession    required   pam_limits.so\n" >> /etc/pam.d/su;
 
 echo "Starting neo4j...";
 chown -R neo4j.neo4j /opt/neo4j-community-1.8.1;

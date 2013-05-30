@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
   # doesn't already exist on the user's system.
 #  config.vm.box_url = "http://theknown.net/CentOS-6.4-x86_64-v20130309.box"
 #	config.vm.box_url = "http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130427.box"
-	config.vm.box_rul = "http://files.vagrantup.com/precise64.box"
+	config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -54,7 +54,7 @@ Vagrant.configure("2") do |config|
 
 
 	# configuration w/ bash script for simplicity
-	config.vm.provision :shell, :path => "provision.sh"
+#	config.vm.provision :shell, :path => "provision.sh"
 
 
   # Enable provisioning with Puppet stand alone.  Puppet manifests
