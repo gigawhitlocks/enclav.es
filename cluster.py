@@ -38,10 +38,10 @@ class Application(tornado.web.Application):
 		handlers = [
 				(r"/", LandingPageHandler),
 				(r"/sign-up", InviteHandler),
-				(r"/logout", LogoutHandler)
+				(r"/logout", LogoutHandler),
 		]
-		tornado.web.Application.__init__(self, handlers,**settings)
 
+		tornado.web.Application.__init__(self, handlers,**settings)
 
 class LandingPageHandler(tornado.web.RequestHandler):
 	def get_current_user(self):
@@ -69,8 +69,8 @@ class LandingPageHandler(tornado.web.RequestHandler):
 	# handles POST requests sent to /
 	# Generally these are login requests
 	def post(self):
-		header_template = env.get_template('content.html')
-		self.write(header_template.render())
+#		header_template = env.get_template('content.html')
+#		self.write(header_template.render())
 		if (self.get_current_user() == None):
 			# Sets up the graph db
 			graph = Graph()
@@ -97,8 +97,13 @@ class LogoutHandler(tornado.web.RequestHandler):
 		self.clear_cookie("username")
 
 class InviteHandler(tornado.web.RequestHandler):
-	def post(self):
+	def get(self):
+		if (self.get_secure_cookie("username") == None):
+			self.write(env.get_template("landingpage.html").render())
+		else:
+			self.write(env.get_template("invite.html").render())
 
+	def post(self):
 		# todo
 		self.set_header("Content-Type","text/plain")
 		self.write("The invitation code you entered was "+self.get_argument("invitecode"))
