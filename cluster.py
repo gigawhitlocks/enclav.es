@@ -57,7 +57,7 @@ class LandingPageHandler(tornado.web.RequestHandler):
 		else:
 			## a user is logged in
 			self.set_header("Content-Type","text/html")
-			header_template = env.get_template('content.html')
+			header_template = env.get_template('base.html')
 			self.write(header_template.render())
 	#		self.write('Thank you for logging in, %s.' %self.get_current_user())
 
@@ -78,7 +78,7 @@ class LandingPageHandler(tornado.web.RequestHandler):
 
 			# open database and look up input username
 			self.set_header("Content-Type", "text/html")
-			user = graph.users.index.get_unique(name=self.get_argument("username")) 
+			user = graph.users.index.get_unique(userid=self.get_argument("username")) 
 			if ( user == None ):
 				self.write("No such user exists\n")
 			else :
@@ -87,7 +87,7 @@ class LandingPageHandler(tornado.web.RequestHandler):
 				if check_password(self.get_argument("password"),user.password):
 
 					# save the session cookie
-					self.set_secure_cookie("username", user.name)
+					self.set_secure_cookie("username", user.userid)
 					self.redirect("/")
 				else:
 					self.write("Password was incorrect")
