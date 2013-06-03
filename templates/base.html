@@ -2,7 +2,7 @@
 <!DOCTYPE html5>
 <html>
 	<head>
-		<title>{% block title %}{% endblock %}</title>
+		<title>{{ title }} | Cluster.im</title>
 		<script src='//ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js' 
 			type='text/javascript'></script>
 	
@@ -32,19 +32,19 @@
 		<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
 		<link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
 
-		{% block header %}{% endblock %}
+		{% block header %}{% endblock header %}
 	</head>
 	<body>
 		<div class="container">
-			<div id="pageheader">{% block pageheader %}{% endblock %}</div>
+			<div id="pageheader">{% block pageheader %}{% endblock pageheader %}</div>
 		</div><!-- container -->
 	
 		<div class="container">
-			<div id="content">{% block content %}{% endblock %}</div>                  <!-- ##### PEW PEW ##### -->
+			<div id="content">{% block content %}{% endblock content %}</div>                  <!-- ##### PEW PEW ##### -->
 		</div><!-- container -->
 	
 		<div class="container">
-			<div id="footer">{% block footer %}{% endblock %}</div>
+			<div id="footer">{% block footer %}{% endblock footer %}</div>
 		</div><!-- container -->
 	</body>
 </html>

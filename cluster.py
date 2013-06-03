@@ -57,7 +57,7 @@ class LandingPageHandler(tornado.web.RequestHandler):
 		else:
 			## a user is logged in
 			self.set_header("Content-Type","text/html")
-			header_template = env.get_template('base.html')
+			header_template = env.get_template('content.html')
 			self.write(header_template.render())
 	#		self.write('Thank you for logging in, %s.' %self.get_current_user())
 
@@ -69,7 +69,7 @@ class LandingPageHandler(tornado.web.RequestHandler):
 	# handles POST requests sent to /
 	# Generally these are login requests
 	def post(self):
-		header_template = env.get_template('base.html')
+		header_template = env.get_template('content.html')
 		self.write(header_template.render())
 		if (self.get_current_user() == None):
 			# Sets up the graph db
