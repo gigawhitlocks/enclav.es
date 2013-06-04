@@ -5,12 +5,24 @@ import random
 import hashlib
 import string
 
+
+"""
+The following three functions are helper functions
+"""
+
+"""
+Creates a salt for use generating password hashes
+"""
 def generate_salt():
 	salt = ""
 	for i in range(0, random.randint(10,30)):
 		salt += random.choice(string.digits+string.letters)
 	return salt
 
+
+"""
+Checks plaintext passwords against hashes in memory for validity. Returns a boolean.
+"""
 def check_password(raw_input, hash):
 	hash = hash.split('$')
 	pword = hash[2]+raw_input
@@ -18,6 +30,9 @@ def check_password(raw_input, hash):
 		pword = hashlib.sha256(pword).hexdigest()
 	return hash[3] == pword
 
+"""
+Hashes a plaintext password into a secure storable hash
+"""
 def generate_storable_password(raw_password):
 		version_number = 1
 		salt = generate_salt()
@@ -28,6 +43,7 @@ def generate_storable_password(raw_password):
 			pword = hashlib.sha256(pword).hexdigest()
 		return "%s$%s$%s$%s" %(version_number, times_hashed, salt, pword)
 
+# pretty self-explanatory
 class User(Node):
 	element_type = "user"
 	userid = String(nullable=False)

@@ -118,12 +118,16 @@ class InviteHandler(ClusterHandler):
 		g.add_proxy("invitees", Invitee)
 		currentinvitee = g.invitees.index.lookup(email=self.get_argument("email")) 
 
+
+		# check to see if this email has already been invited. If it has, remove all of its previos occurrences
 		if ( currentinvitee != None ):
 			for current in currentinvitee:
 				g.invitees.delete(current.eid)
 
 		currentinvitee = g.invitees.create(email=self.get_argument("email"), token=uuid.uuid4().hex, invited_by=self.get_secure_cookie("username"))
 
+
+		## build the email and send it. SMTP host is localhost for now.
 		s = smtplib.SMTP('localhost')
 		headers = Parser().parsestr('From: <noreply@cluster.im>\n'
         'To: <'+ self.get_argument("email") +'>\n'
@@ -135,16 +139,9 @@ class InviteHandler(ClusterHandler):
 		self.redirect("/invite")
 
 """
-The GET method in this Handler is for users who wish to send invites.
-POST handles the form on the landing page for new users signing up.
-This design is kind of dumb, maybe things should be moved around, IDK.
+This route handles incoming new users sent from their email to sign-up/?token=[generated token]
 """
-
 class SignUpHandler(ClusterHandler):
-	def post(self):
-		self.set_header("Content-Type","text/plain")
-		self.write("The invitation code you entered was "+self.get_argument("invitecode"))
-
 	def get(self):
 		graph = Graph()
 		graph.add_proxy("invitees", Invitee)
