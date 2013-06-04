@@ -44,9 +44,9 @@ class Application(tornado.web.Application):
 		"""
 		handlers = [
 				(r"/", LandingPageHandler),
-				(r"/sign-up", InviteHandler),
+				(r"/sign-up", SignUpHandler),
 				(r"/logout", LogoutHandler),
-				(r"/invite", SendInviteHandler)
+				(r"/invite", InviteHandler)
 		]
 		"""
 		#######################################################

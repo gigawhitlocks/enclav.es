@@ -7,12 +7,19 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 from tornado.options import define, options
+
 from bulbs.neo4jserver import Graph
 from session import *
 import redis
+
+
 import hashlib
 from jinja2 import Environment, FileSystemLoader
 from users import User, check_password
+
+
+import smtplib
+from email.parser import Parser
 
 class ClusterHandler(tornado.web.RequestHandler):
 
@@ -98,21 +105,32 @@ class LogoutHandler(ClusterHandler):
 """
 Handler for sending out invitation emails.
 """
-class SendInviteHandler(ClusterHandler):
+class InviteHandler(ClusterHandler):
+	def get(self):
+		self.require_login()
+		self.write(self.env.get_template("invite.html").render())
 	def post(self):
 		self.require_login()
 
+#  If the e-mail headers are in a file, uncomment this line:
+#headers = Parser().parse(open(messagefile, 'r'))
+		s = smtplib.SMTP('localhost')
+#  Or for parsing headers in a string, use:
+		headers = Parser().parsestr('From: <noreply@cluster.im>\n'
+        'To: \n'
+        'Subject: You have been invited to Cluster.im\n'
+        '\n'
+        'Body would go here\n')
+
+		s.sendmail(headers['from'],[headers['to']],headers.as_string())
 
 """
 The GET method in this Handler is for users who wish to send invites.
 POST handles the form on the landing page for new users signing up.
 This design is kind of dumb, maybe things should be moved around, IDK.
 """
-class InviteHandler(ClusterHandler):
-	def get(self):
-		self.require_login()
-		self.write(self.env.get_template("invite.html").render())
 
+class SignUpHandler(ClusterHandler):
 	def post(self):
 		self.set_header("Content-Type","text/plain")
 		self.write("The invitation code you entered was "+self.get_argument("invitecode"))
