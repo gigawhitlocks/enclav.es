@@ -34,6 +34,12 @@ class User(Node):
 	password = String(nullable=False)
 	created = DateTime(default=current_datetime, nullable=False)
 
+class Invitee(Node):
+	element_type = "invitee"
+	email = String(nullable=False)
+	token = String(nullable=False)
+	created = DateTime(default=current_datetime, nullable=False)
+
 class Follows(Relationship):
 	label = "follows"
 	created = DateTime(default=current_datetime, nullable=False)
