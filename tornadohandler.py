@@ -15,11 +15,13 @@ import redis
 
 import hashlib
 from jinja2 import Environment, FileSystemLoader
-from users import User, check_password
-
+from users import User, check_password, Invitee
 
 import smtplib
 from email.parser import Parser
+
+import uuid
+
 
 class ClusterHandler(tornado.web.RequestHandler):
 
@@ -112,17 +114,25 @@ class InviteHandler(ClusterHandler):
 	def post(self):
 		self.require_login()
 
-#  If the e-mail headers are in a file, uncomment this line:
-#headers = Parser().parse(open(messagefile, 'r'))
+		g = Graph()
+		g.add_proxy("invitees", Invitee)
+		currentinvitee = g.invitees.index.lookup(email=self.get_argument("email")) 
+
+		if ( currentinvitee != None ):
+			for current in currentinvitee:
+				g.invitees.delete(current.eid)
+
+		currentinvitee = g.invitees.create(email=self.get_argument("email"), token=uuid.uuid4().hex, invited_by=self.get_secure_cookie("username"))
+
 		s = smtplib.SMTP('localhost')
-#  Or for parsing headers in a string, use:
 		headers = Parser().parsestr('From: <noreply@cluster.im>\n'
-        'To: \n'
+        'To: <'+ self.get_argument("email") +'>\n'
         'Subject: You have been invited to Cluster.im\n'
         '\n'
-        'Body would go here\n')
+				'Click here to accept the invitation: http://localhost:8080/sign-up?token='+currentinvitee.token+'\n')
 
 		s.sendmail(headers['from'],[headers['to']],headers.as_string())
+		self.redirect("/invite")
 
 """
 The GET method in this Handler is for users who wish to send invites.
@@ -134,4 +144,19 @@ class SignUpHandler(ClusterHandler):
 	def post(self):
 		self.set_header("Content-Type","text/plain")
 		self.write("The invitation code you entered was "+self.get_argument("invitecode"))
+
+	def get(self):
+		graph = Graph()
+		graph.add_proxy("invitees", Invitee)
+		currentinvitee = graph.invitees.index.lookup(token=self.get_argument("token"))
+		if ( currentinvitee == None ) :
+			self.redirect("/")
+		else:
+			## do stuff
+			self.write("Success!")
+
+			## to do: also check expiry on token
+			## destroy token after use, either way
+			## load template for actual user signup form
+
 
