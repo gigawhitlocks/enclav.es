@@ -39,6 +39,7 @@ class Invitee(Node):
 	email = String(nullable=False)
 	token = String(nullable=False)
 	created = DateTime(default=current_datetime, nullable=False)
+	invited_by = String(nullable=False)
 
 class Follows(Relationship):
 	label = "follows"
