@@ -102,6 +102,12 @@ class SendInviteHandler(ClusterHandler):
 	def post(self):
 		self.require_login()
 
+
+"""
+The GET method in this Handler is for users who wish to send invites.
+POST handles the form on the landing page for new users signing up.
+This design is kind of dumb, maybe things should be moved around, IDK.
+"""
 class InviteHandler(ClusterHandler):
 	def get(self):
 		self.require_login()

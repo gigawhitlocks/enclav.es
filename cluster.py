@@ -24,7 +24,8 @@ from users import User, check_password
 #define port for the server to run on
 define("port", default=8000, help="run on the given port", type=int) 
 
-#handles routes
+
+
 class Application(tornado.web.Application):
 	def __init__(self):
 		settings = {
@@ -34,12 +35,26 @@ class Application(tornado.web.Application):
 		self.redis = redis.StrictRedis()
 		self.session_store = RedisSessionStore(self.redis)
 
+		"""
+		#######################################################
+		THIS IS WHERE ROUTES ARE DEFINED.
+		May want to move these elsewhere at some point,
+		but for now let's just highlight them with this comment.
+		#######################################################
+		"""
 		handlers = [
 				(r"/", LandingPageHandler),
 				(r"/sign-up", InviteHandler),
 				(r"/logout", LogoutHandler),
 				(r"/invite", SendInviteHandler)
 		]
+		"""
+		#######################################################
+		Also with this comment
+		#######################################################
+		"""
+
+
 
 		tornado.web.Application.__init__(self, handlers,**settings)
 
