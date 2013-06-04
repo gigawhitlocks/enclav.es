@@ -5,7 +5,7 @@ Cluster.im
 
 ###Want to help out?
 1. Check out the repository.
-3. Install Vagrant [http://vagrantup.com](vagrantup.com) if you do not have it
+3. Install [Vagrant](http://vagrantup.com)if you do not have it
 4. ```vagrant up``` in the project directory 
 5. ```vagrant ssh``` to log into the VM
 6. ```sudo ./postinstall.sh``` and wait for it to complete (this will take awhile)
