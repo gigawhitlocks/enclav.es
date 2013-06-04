@@ -10,7 +10,7 @@ apt-get install oracle-java6-installer -y;
 
 # symlink the project directory somewhere more convenient
 ln -s /vagrant/ /home/vagrant/cluster;
-apt-get install python-pip screen expect -y -q;
+apt-get install python-dev swig python-pip screen make ipython expect -y -q;
 pip install -r /home/vagrant/cluster/requirements.txt
 
 echo "Downloading Neo4j..";
