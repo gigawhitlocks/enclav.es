@@ -15,35 +15,59 @@ from jinja2 import Environment, FileSystemLoader
 from users import User, check_password
 
 class ClusterHandler(tornado.web.RequestHandler):
+
 	env = Environment(loader=FileSystemLoader('templates')) 
+
+	"""
+	Checks to see if a user is logged.
+	"""
 	def is_logged_in(self):
 		return self.get_secure_cookie("username") != None
 	
+	"""
+	Call at the beginning of a Handler to redirect non-users to 
+	the site's homepage.
+	"""
+	def require_login(self):
+		if (not self.is_logged_in()):
+			self.redirect("/")
 
+"""
+LandingPageHandler handles all requests sent to the root of the domain.
+This means displaying a login page when no user is logged in and the home page
+for logged in users.
+
+It also handles POST requests sent to the root, which is where logins are handled.
+"""
 class LandingPageHandler(ClusterHandler):
-	# handles GET requests sent to /
+
+	"""
+	Handles requests to the root of the site when visiting normally
+	(GET requests)
+	"""
 	def get(self):
-		if(self.get_secure_cookie("username") == None):
-			## we aren't logged in; load the landing page:
+		if(not self.is_logged_in()):
 			landingpage_template = self.env.get_template('landingpage.html')
 			self.write(landingpage_template.render())
-
 		else:
-			## a user is logged in
 			self.set_header("Content-Type","text/html")
 			header_template =	self.write(self.env.get_template('content.html').render())
-	#		self.write('Thank you for logging in, %s.' %self.get_current_user())
 
+	"""
+	Session stores a cookie with the userID in the browser for persistent sessions.
+	The redis bit is half-implemented.
+	TODO: determine if server-side sessions are really even necessary
+	"""
 	def session(self):
 		sessionid = self.get_secure_cookie('sid')
 		return Session(self.application.session_store, sessionid)
 
+	"""
 	# handles POST requests sent to /
 	# Generally these are login requests
+	"""
 	def post(self):
-#		header_template = self.env.get_template('content.html')
-#		self.write(header_template.render())
-		if (not self.is_logged_in()):
+		if ( not self.is_logged_in() ):
 			# Sets up the graph db
 			graph = Graph()
 			graph.add_proxy("users",User)
@@ -62,22 +86,26 @@ class LandingPageHandler(ClusterHandler):
 					self.redirect("/")
 				else:
 					self.write("Password was incorrect")
-
+"""
+Destroys existing sessions
+Send a GET to /logout to trigger this Handler
+"""
 class LogoutHandler(ClusterHandler):
 	def get(self):
 		self.clear_cookie("username")
 
+
+"""
+Handler for sending out invitation emails.
+"""
 class SendInviteHandler(ClusterHandler):
 	def post(self):
-		if (not self.is_logged_in()):
-			return None
+		self.require_login()
 
 class InviteHandler(ClusterHandler):
 	def get(self):
-		if (not self.is_logged_in()):
-			self.write(self.env.get_template("landingpage.html").render())
-		else:
-			self.write(self.env.get_template("invite.html").render())
+		self.require_login()
+		self.write(self.env.get_template("invite.html").render())
 
 	def post(self):
 		self.set_header("Content-Type","text/plain")
