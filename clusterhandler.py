@@ -103,7 +103,7 @@ Send a GET to /logout to trigger this Handler
 class LogoutHandler(ClusterHandler):
 	def get(self):
 		self.clear_cookie("username")
-
+		self.redirect("/")
 
 """
 Handler for sending out invitation emails.
