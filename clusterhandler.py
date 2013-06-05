@@ -15,7 +15,7 @@ import redis
 
 import hashlib
 from jinja2 import Environment, FileSystemLoader
-from users import User, check_password, Invitee
+from users import User, check_password, Invitee, generate_storable_password
 
 import smtplib
 from email.parser import Parser
@@ -31,19 +31,30 @@ class ClusterHandler(tornado.web.RequestHandler):
 	env = Environment(loader=FileSystemLoader('templates')) 
 
 	"""
-	Checks to see if a user is logged.
+	Checks to see if a user is logged in.
 	"""
 	def is_logged_in(self):
 		return self.get_secure_cookie("username") != None
-	
-	"""
-	Call at the beginning of a Handler to redirect non-users to 
-	the site's homepage.
-	"""
-	def require_login(self):
-		if (not self.is_logged_in()):
-			self.redirect("/")
 
+
+	"""
+	Use for throwing a 403 when a user does something that is not permitted
+	"""
+	def forbidden(self):
+		self.clear()
+		self.set_status(403)
+		self.finish("<html><body><h1>403 That is not permitted</h1></body></html>")
+
+	"""
+	Use as a decorator around functions that require the user be logged in
+	"""
+	@staticmethod
+	def require_login(function):
+		def new_function(self):
+			if (not self.is_logged_in()):
+				self.forbidden()
+			function(self)
+		return new_function
 """
 LandingPageHandler handles all requests sent to the root of the domain.
 This means displaying a login page when no user is logged in and the home page
@@ -80,13 +91,11 @@ class LandingPageHandler(ClusterHandler):
 	"""
 	def post(self):
 		if ( not self.is_logged_in() ):
-			# Sets up the self.graph db
-
 			# open database and look up input username
 			self.set_header("Content-Type", "text/html")
 			user = self.graph.users.index.get_unique(userid=self.get_argument("username")) 
 			if ( user == None ):
-				self.write("No such user exists\n")
+				self.write("Username or password was incorrect.\n")
 			else :
 
 				# check that password is correct
@@ -95,7 +104,7 @@ class LandingPageHandler(ClusterHandler):
 					self.set_secure_cookie("username", user.userid)
 					self.redirect("/")
 				else:
-					self.write("Password was incorrect")
+					self.write("Username or password was incorrect.\n")
 """
 Destroys existing sessions
 Send a GET to /logout to trigger this Handler
@@ -109,11 +118,15 @@ class LogoutHandler(ClusterHandler):
 Handler for sending out invitation emails.
 """
 class InviteHandler(ClusterHandler):
+
+
+	@ClusterHandler.require_login	
 	def get(self):
-		self.require_login()
 		self.write(self.env.get_template("invite.html").render())
+
+	
+	@ClusterHandler.require_login	
 	def post(self):
-		self.require_login()
 
 		currentinvitee = self.graph.invitees.index.lookup(email=self.get_argument("email")) 
 
@@ -123,7 +136,8 @@ class InviteHandler(ClusterHandler):
 			for current in currentinvitee:
 				self.graph.invitees.delete(current.eid)
 
-		currentinvitee = self.graph.invitees.create(email=self.get_argument("email"), token=uuid.uuid4().hex, invited_by=self.get_secure_cookie("username"))
+		currentinvitee = self.graph.invitees.create(email=self.get_argument("email"), 
+											token=uuid.uuid4().hex, invited_by=self.get_secure_cookie("username"))
 
 
 		## build the email and send it. SMTP host is localhost for now.
@@ -147,6 +161,28 @@ class SignUpHandler(ClusterHandler):
 			self.redirect("/")
 		else:
 			## do stuff
-			self.write(self.env.get_template('signup.html').render())
+			self.set_secure_cookie("token",self.get_argument("token"))
+			self.write(self.env.get_template('sign-up.html').render())
 			## to do: also check expiry on token
 
+	def post(self):
+		#userid
+		#password (generate storable password)
+		
+		# first confirm that the user is coming from the SignUp page:
+		
+		invitee = self.graph.invitees.index.lookup(token=self.get_secure_cookie("token"))
+		if (invitee == None):
+			self.forbidden()
+		else:
+			newuser = self.graph.invitees.index.lookup(userid=self.get_argument("userid"))
+			if newuser:
+				self.write("User exists")
+			else:
+				self.graph.users.create(
+						userid=self.get_argument("userid"),
+						password=generate_storable_password(self.get_argument("password")))
+
+				self.clear_cookie("token")
+				for i in invitee:
+					self.graph.invitees.delete(i.eid)

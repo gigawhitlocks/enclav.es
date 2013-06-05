@@ -2,7 +2,7 @@
 {% set title = "Welcome to Cluster!" %}
 
 {% block content %}
-<form id="invite" action="/signup" method="post">
+<form id="invite" action="/sign-up" method="post">
 	Please choose a main username and password (you will be able to choose more display names later):	<br />
 	<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 	Username: <input type="text" name="userid"><br />
