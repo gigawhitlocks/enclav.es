@@ -9,7 +9,6 @@ import tornado.web
 from tornado.options import define, options
 
 from bulbs.neo4jserver import Graph
-from session import *
 import redis
 
 

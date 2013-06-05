@@ -12,7 +12,7 @@ import redis
 from tornado.options import define, options
 from jinja2 import Environment, FileSystemLoader
 from clusterhandler import * 
-from session import *
+#from session import *
 import hashlib
 from random import random
 
@@ -32,8 +32,6 @@ class Application(tornado.web.Application):
 			'cookie_secret': "GOTTA HAVE MY COOKIE SECRETE",
 	    "xsrf_cookies": False
 		}
-		self.redis = redis.StrictRedis()
-		self.session_store = RedisSessionStore(self.redis)
 
 		"""
 		#######################################################
