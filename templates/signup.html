@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% set title = "Welcome to Cluster!" %}
+
+{% block content %}
+<form id="invite" action="/signup" method="post">
+	Please choose a main username and password (you will be able to choose more display names later):	<br />
+	<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+	Username: <input type="text" name="userid"><br />
+	Password: <input type="password" name="password"><br />
+	<input type="submit">	
+</form>
+
+{% endblock content %}

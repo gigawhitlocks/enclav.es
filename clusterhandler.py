@@ -150,10 +150,9 @@ class SignUpHandler(ClusterHandler):
 			self.redirect("/")
 		else:
 			## do stuff
-			self.write("Success!")
-
+			self.write(self.env.get_template('signup.html').render())
 			## to do: also check expiry on token
-			## destroy token after use, either way
-			## load template for actual user signup form
-
+	def post(self):
+		for c in currentinvitee:
+			graph.invitees.delete(c)
 

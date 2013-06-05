@@ -11,7 +11,7 @@ import redis
 
 from tornado.options import define, options
 from jinja2 import Environment, FileSystemLoader
-from tornadohandler import * 
+from clusterhandler import * 
 from session import *
 import hashlib
 from random import random
