@@ -24,6 +24,9 @@ import uuid
 
 
 class ClusterHandler(tornado.web.RequestHandler):
+	graph = Graph()
+	graph.add_proxy("invitees", Invitee)
+	graph.add_proxy("users",User)
 
 	env = Environment(loader=FileSystemLoader('templates')) 
 
@@ -77,13 +80,11 @@ class LandingPageHandler(ClusterHandler):
 	"""
 	def post(self):
 		if ( not self.is_logged_in() ):
-			# Sets up the graph db
-			graph = Graph()
-			graph.add_proxy("users",User)
+			# Sets up the self.graph db
 
 			# open database and look up input username
 			self.set_header("Content-Type", "text/html")
-			user = graph.users.index.get_unique(userid=self.get_argument("username")) 
+			user = self.graph.users.index.get_unique(userid=self.get_argument("username")) 
 			if ( user == None ):
 				self.write("No such user exists\n")
 			else :
@@ -114,17 +115,15 @@ class InviteHandler(ClusterHandler):
 	def post(self):
 		self.require_login()
 
-		g = Graph()
-		g.add_proxy("invitees", Invitee)
-		currentinvitee = g.invitees.index.lookup(email=self.get_argument("email")) 
+		currentinvitee = self.graph.invitees.index.lookup(email=self.get_argument("email")) 
 
 
 		# check to see if this email has already been invited. If it has, remove all of its previos occurrences
 		if ( currentinvitee != None ):
 			for current in currentinvitee:
-				g.invitees.delete(current.eid)
+				self.graph.invitees.delete(current.eid)
 
-		currentinvitee = g.invitees.create(email=self.get_argument("email"), token=uuid.uuid4().hex, invited_by=self.get_secure_cookie("username"))
+		currentinvitee = self.graph.invitees.create(email=self.get_argument("email"), token=uuid.uuid4().hex, invited_by=self.get_secure_cookie("username"))
 
 
 		## build the email and send it. SMTP host is localhost for now.
@@ -143,16 +142,11 @@ This route handles incoming new users sent from their email to sign-up/?token=[g
 """
 class SignUpHandler(ClusterHandler):
 	def get(self):
-		graph = Graph()
-		graph.add_proxy("invitees", Invitee)
-		currentinvitee = graph.invitees.index.lookup(token=self.get_argument("token"))
+		currentinvitee = self.graph.invitees.index.lookup(token=self.get_argument("token"))
 		if ( currentinvitee == None ) :
 			self.redirect("/")
 		else:
 			## do stuff
 			self.write(self.env.get_template('signup.html').render())
 			## to do: also check expiry on token
-	def post(self):
-		for c in currentinvitee:
-			graph.invitees.delete(c)
 
