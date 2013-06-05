@@ -1,2 +1,12 @@
 {% extends "base.html" %}
 {% set title = "Invite someone to Cluster!" %}
+
+{% block content %}
+<form id="invite" action="/invite" method="post">
+	
+	<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+	<input type="text" name="email">
+	<input type="submit">	
+</form>
+
+{% endblock content %}
