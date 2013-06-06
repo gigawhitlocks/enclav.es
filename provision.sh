@@ -14,7 +14,7 @@ ln -s /vagrant/ /home/vagrant/cluster;
 ##############
 #INSTALL REQUIRED PACKAGES
 ##############
-apt-get install python-pip screen make bpython expect -y -q;
+apt-get install sendmail git zip python-pip screen make bpython expect -y -q;
 
 ##############
 #INSTALL PYTHON DEPS.
@@ -39,18 +39,22 @@ chown -R neo4j.neo4j /opt/neo4j-community-1.8.1;
 /opt/neo4j-community-1.8.1/bin/neo4j start;
 cd /home/vagrant/;
 
+
+wget http://tinkerpop.com/downloads/gremlin/gremlin-groovy-2.3.0.zip;
+unzip gremlin-groovy-2.3.0.zip;
+
 # Download redis
 
-echo "Installing redis..";
-wget https://dl.dropboxusercontent.com/u/14943993/redis-2.6.9.tar.gz;
-tar xf redis-[0-9]*;
-cd redis-[0-9]*;
-make;
-make install;
-sysctl vm.overcommit_memory=1;
-echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf
+#echo "Installing redis..";
+#wget https://dl.dropboxusercontent.com/u/14943993/redis-2.6.9.tar.gz;
+#tar xf redis-[0-9]*;
+#cd redis-[0-9]*;
+#make;
+#make install;
+#sysctl vm.overcommit_memory=1;
+#echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf
 
 # set redis to run in background & then run redis
-sed -i.bak 's/daemonize no/daemonize yes/g' /home/vagrant/redis-[0-9]*/redis.conf
-/usr/local/bin/redis-server /home/vagrant/redis-[0-9]*/redis.conf &
+#sed -i.bak 's/daemonize no/daemonize yes/g' /home/vagrant/redis-[0-9]*/redis.conf
+#/usr/local/bin/redis-server /home/vagrant/redis-[0-9]*/redis.conf &
 
