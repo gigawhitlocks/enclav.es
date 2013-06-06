@@ -119,11 +119,19 @@ Handler for sending out invitation emails.
 class InviteHandler(ClusterHandler):
 
 
+
+	"""
+		This loads the invitation creation dialog, for existing users to send invitations
+	"""
 	@ClusterHandler.require_login	
 	def get(self):
 		self.write(self.env.get_template("invite.html").render())
 
 	
+
+	"""
+	This actually sends out the email when the existing user clicks 'send'
+	"""
 	@ClusterHandler.require_login	
 	def post(self):
 
@@ -135,8 +143,12 @@ class InviteHandler(ClusterHandler):
 			for current in currentinvitee:
 				self.graph.invitees.delete(current.eid)
 
-		currentinvitee = self.graph.invitees.create(email=self.get_argument("email"), 
-											token=uuid.uuid4().hex, invited_by=self.get_secure_cookie("username"))
+
+		#creates an Invitee object with the given email and a generated uuid
+		currentinvitee = self.graph.invitees.create(
+											email=self.get_argument("email"), 
+											token=uuid.uuid4().hex,							#TODO: Make this more secure?
+											invited_by=self.get_secure_cookie("username"))
 
 
 		## build the email and send it. SMTP host is localhost for now.
@@ -145,6 +157,7 @@ class InviteHandler(ClusterHandler):
         'To: <'+ self.get_argument("email") +'>\n'
         'Subject: You have been invited to Cluster.im\n'
         '\n'
+				## TODO: Write out a better invite email
 				'Click here to accept the invitation: http://localhost:8080/sign-up?token='+currentinvitee.token+'\n')
 
 		s.sendmail(headers['from'],[headers['to']],headers.as_string())
@@ -154,21 +167,21 @@ class InviteHandler(ClusterHandler):
 This route handles incoming new users sent from their email to sign-up/?token=[generated token]
 """
 class SignUpHandler(ClusterHandler):
+
+	#This checks to make sure the provided token is valid
 	def get(self):
 		currentinvitee = self.graph.invitees.index.lookup(token=self.get_argument("token"))
 		if ( currentinvitee == None ) :
 			self.redirect("/")
 		else:
-			## do stuff
+			## If the token is valid load the new user form
 			self.set_secure_cookie("token",self.get_argument("token"))
 			self.write(self.env.get_template('sign-up.html').render())
-			## to do: also check expiry on token
+			## TODO: also check expiry on token
 
+
+	#This processes the new user form and creates the new user if the username isn't taken already	
 	def post(self):
-		#userid
-		#password (generate storable password)
-		
-		# first confirm that the user is coming from the SignUp page:
 		
 		invitee = self.graph.invitees.index.lookup(token=self.get_secure_cookie("token"))
 		if (invitee == None):

@@ -13,10 +13,27 @@
 		
 		<style type="text/css">
 			body {margin: 0; padding: 0;
-				background-color:#333333;
-				color:#DDDDDD;
+				background-color:#DDDDDD;
+				color:#333333;
 				font-family: Arial,sans-serif;
+
 			}
+
+			#nav {
+				text-align: center;
+				float: right;
+			}
+
+			#nav li{
+				margin-right: 10px;
+				float: left;
+				display:block;
+			}
+
+			.content{
+				clear: both;
+			}
+
 		</style>
 
  	 <!--[if lt IE 9]>
@@ -34,7 +51,16 @@
 	</head>
 	<body>
 		<div class="container">
-			<div id="pageheader">{% block pageheader %}{% endblock pageheader %}</div>
+			<div id="pageheader" class="twelve columns">
+				{% block pageheader %}
+				<h3><a href="/">Cluster.im</a></h3>
+					<ul id="nav">
+						<li><a href="/invite">Invite</a></li>
+						<li><a href="/settings">Settings</a></li>
+						<li style="margin-right:0"><a href="/logout">Log out</a></li>
+					</ul>
+				{% endblock pageheader %}
+				</div>
 		</div><!-- container -->
 	
 		<div class="container">

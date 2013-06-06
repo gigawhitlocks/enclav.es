@@ -14,7 +14,7 @@ ln -s /vagrant/ /home/vagrant/cluster;
 ##############
 #INSTALL REQUIRED PACKAGES
 ##############
-apt-get install python-pip screen make ipython expect -y -q;
+apt-get install python-pip screen make bpython expect -y -q;
 
 ##############
 #INSTALL PYTHON DEPS.

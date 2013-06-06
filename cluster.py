@@ -12,14 +12,12 @@ import redis
 from tornado.options import define, options
 from jinja2 import Environment, FileSystemLoader
 from clusterhandler import * 
-#from session import *
 import hashlib
 from random import random
 
 from bulbs.neo4jserver import Graph
 from users import User, check_password
 
-#load ./templates/
 
 #define port for the server to run on
 define("port", default=8000, help="run on the given port", type=int) 
@@ -41,6 +39,7 @@ class Application(tornado.web.Application):
 		#######################################################
 		"""
 		handlers = [
+			  (r"/css/(.*)", tornado.web.StaticFileHandler, {'path': 'static/css'}),
 				(r"/", LandingPageHandler),
 				(r"/sign-up", SignUpHandler),
 				(r"/logout", LogoutHandler),
