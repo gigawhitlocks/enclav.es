@@ -1,6 +1,5 @@
 GnuPGInterface==0.3.2
 Jinja2==2.7
-M2Crypto==0.21.1
 MarkupSafe==0.18
 PyYAML==3.10
 apt-xapian-index==0.44

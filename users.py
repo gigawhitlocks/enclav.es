@@ -16,7 +16,7 @@ Creates a salt for use generating password hashes
 def generate_salt():
 	salt = ""
 	for i in range(0, random.randint(10,30)):
-		salt += random.choice(string.digits+string.letters)
+		salt += random.choice(string.digits+string.ascii_letters)
 	return salt
 
 
@@ -55,10 +55,12 @@ class Invitee(Node):
 	email = String(nullable=False)
 	token = String(nullable=False)
 	created = DateTime(default=current_datetime, nullable=False)
-	invited_by = String(nullable=False)
 
 class Follows(Relationship):
 	label = "follows"
 	created = DateTime(default=current_datetime, nullable=False)
 
+class Invited(Relationship):
+	label = "invited"
+	created = DateTime(default=current_datetime, nullable=False)
 
