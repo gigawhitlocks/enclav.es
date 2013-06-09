@@ -1,0 +1,5 @@
+a { text-decoration: none}
+a:link { color: #4E9258 } /* unvisited links */
+a:visited { color: #4E9258 } /* visited links */
+a:hover { text-decoration: underline; } /* user hovers */
+a:active { color: #4D7684} /* active links */

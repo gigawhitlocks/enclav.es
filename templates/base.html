@@ -10,12 +10,12 @@
 		<link rel="stylesheet" href="css/base.css">
 		<link rel="stylesheet" href="css/skeleton.css">
 		<link rel="stylesheet" href="css/layout.css">
+		<link rel="stylesheet" href="css/custom.css">
 		
 		<style type="text/css">
 			body {margin: 0; padding: 0;
 				background-color:#DDDDDD;
 				color:#333333;
-				font-family: Arial,sans-serif;
 
 			}
 
@@ -50,15 +50,19 @@
 		{% block header %}{% endblock header %}
 	</head>
 	<body>
-		<div class="container">
-			<div id="pageheader" class="twelve columns">
+		<div class="container" style="margin-top:10px">
+			<div id="pageheader"> 
 				{% block pageheader %}
-				<h3><a href="/">Cluster.im</a></h3>
+				<div class="ten columns">
+					<h3><a href="/">Cluster.im</a></h3>
+				</div>
+				<div class="six columns">
 					<ul id="nav">
 						<li><a href="/invite">Invite</a></li>
 						<li><a href="/settings">Settings</a></li>
 						<li style="margin-right:0"><a href="/logout">Log out</a></li>
 					</ul>
+				</div>
 				{% endblock pageheader %}
 				</div>
 		</div><!-- container -->
