@@ -14,7 +14,7 @@ import redis
 
 import hashlib
 from jinja2 import Environment, FileSystemLoader
-from users import User, check_password, Invitee, generate_storable_password
+from users import Invited, User, check_password, Invitee, generate_storable_password
 
 import smtplib
 from email.parser import Parser
@@ -25,7 +25,9 @@ import uuid
 class ClusterHandler(tornado.web.RequestHandler):
 	graph = Graph()
 	graph.add_proxy("invitees", Invitee)
+	graph.add_proxy("invited", Invited)
 	graph.add_proxy("users",User)
+	graph.scripts.update("traversals.groovy")
 
 	env = Environment(loader=FileSystemLoader('templates')) 
 
@@ -33,7 +35,7 @@ class ClusterHandler(tornado.web.RequestHandler):
 	Checks to see if a user is logged in.
 	"""
 	def is_logged_in(self):
-		return self.get_secure_cookie("username") != None
+		return self.get_secure_cookie("userid") != None
 
 
 	"""
@@ -42,7 +44,7 @@ class ClusterHandler(tornado.web.RequestHandler):
 	def forbidden(self):
 		self.clear()
 		self.set_status(403)
-		self.finish("<html><body><h1>403 That is not permitted</h1></body></html>")
+		self.finish("<html><body><h3>403 That is not permitted</h1></body></html>")
 
 	"""
 	Use as a decorator around functions that require the user be logged in
@@ -73,7 +75,7 @@ class LandingPageHandler(ClusterHandler):
 			self.write(landingpage_template.render())
 		else:
 			self.set_header("Content-Type","text/html")
-			header_template =	self.write(self.env.get_template('content.html').render())
+			header_template =	self.write(self.env.get_template('content.html').render(user=self.get_secure_cookie("userid")))
 
 	"""
 	Session stores a cookie with the userID in the browser for persistent sessions.
@@ -100,7 +102,7 @@ class LandingPageHandler(ClusterHandler):
 				# check that password is correct
 				if check_password(self.get_argument("password"),user.password):
 					# save the session cookie
-					self.set_secure_cookie("username", user.userid)
+					self.set_secure_cookie("userid", user.userid)
 					self.redirect("/")
 				else:
 					self.write("Username or password was incorrect.\n")
@@ -110,25 +112,19 @@ Send a GET to /logout to trigger this Handler
 """
 class LogoutHandler(ClusterHandler):
 	def get(self):
-		self.clear_cookie("username")
+		self.clear_cookie("userid")
 		self.redirect("/")
 
 """
 Handler for sending out invitation emails.
 """
 class InviteHandler(ClusterHandler):
-
-
-
 	"""
 		This loads the invitation creation dialog, for existing users to send invitations
 	"""
 	@ClusterHandler.require_login	
 	def get(self):
 		self.write(self.env.get_template("invite.html").render())
-
-	
-
 	"""
 	This actually sends out the email when the existing user clicks 'send'
 	"""
@@ -136,10 +132,8 @@ class InviteHandler(ClusterHandler):
 	def post(self):
 
 		currentinvitee = self.graph.invitees.index.lookup(email=self.get_argument("email")) 
-
-
 		# check to see if this email has already been invited. If it has, remove all of its previos occurrences
-		if ( currentinvitee != None ):
+		if ( currentinvitee is not None ):
 			for current in currentinvitee:
 				self.graph.invitees.delete(current.eid)
 
@@ -147,9 +141,10 @@ class InviteHandler(ClusterHandler):
 		#creates an Invitee object with the given email and a generated uuid
 		currentinvitee = self.graph.invitees.create(
 											email=self.get_argument("email"), 
-											token=uuid.uuid4().hex,							#TODO: Make this more secure?
-											invited_by=self.get_secure_cookie("username"))
+											token=uuid.uuid4().hex) #TODO: Does this need to be more secure?
 
+		currentuser = self.graph.users.index.lookup(userid=self.get_secure_cookie("userid")).next()
+		self.graph.invited.create(currentuser, currentinvitee)
 
 		## build the email and send it. SMTP host is localhost for now.
 		s = smtplib.SMTP('localhost')
@@ -171,7 +166,7 @@ class SignUpHandler(ClusterHandler):
 	#This checks to make sure the provided token is valid
 	def get(self):
 		currentinvitee = self.graph.invitees.index.lookup(token=self.get_argument("token"))
-		if ( currentinvitee == None ) :
+		if ( currentinvitee is None ) :
 			self.redirect("/")
 		else:
 			## If the token is valid load the new user form
@@ -184,17 +179,25 @@ class SignUpHandler(ClusterHandler):
 	def post(self):
 		
 		invitee = self.graph.invitees.index.lookup(token=self.get_secure_cookie("token"))
-		if (invitee == None):
+		if (invitee is None):
 			self.forbidden()
 		else:
-			newuser = self.graph.invitees.index.lookup(userid=self.get_argument("userid"))
-			if newuser:
-				self.write("User exists")
+			newuser = self.graph.users.index.lookup(userid=self.get_argument("userid"))
+			if newuser is not None:
+				self.write("Username is taken")
 			else:
-				self.graph.users.create(
+				newuser = self.graph.users.create(
 						userid=self.get_argument("userid"),
 						password=generate_storable_password(self.get_argument("password")))
+				
 
+				
+				get_inviter = self.graph.scripts.get('getInviter')
+				inviter = self.graph.gremlin.query(get_inviter, dict(_id=invitee.next().eid)).next()
+				self.graph.invited.create(inviter,newuser)
 				self.clear_cookie("token")
+				self.clear_cookie("userid")
 				for i in invitee:
 					self.graph.invitees.delete(i.eid)
+
+				self.redirect("/")
