@@ -11,7 +11,7 @@ import redis
 
 from tornado.options import define, options
 from jinja2 import Environment, FileSystemLoader
-from clusterhandler import * 
+from handlers import * 
 import hashlib
 from random import random
 
@@ -44,7 +44,8 @@ class Application(tornado.web.Application):
 				(r"/", LandingPageHandler),
 				(r"/sign-up", SignUpHandler),
 				(r"/logout", LogoutHandler),
-				(r"/invite", InviteHandler)
+				(r"/invite", InviteHandler),
+				(r"/settings", SettingsHandler)
 		]
 		"""
 		#######################################################

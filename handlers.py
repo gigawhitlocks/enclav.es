@@ -14,19 +14,20 @@ import redis
 
 import hashlib
 from jinja2 import Environment, FileSystemLoader
-from users import Invited, User, check_password, Invitee, generate_storable_password
-
+from users import *
 import smtplib
 from email.parser import Parser
 
 import uuid
 
 
-class ClusterHandler(tornado.web.RequestHandler):
+class EnclavesHandler(tornado.web.RequestHandler):
 	graph = Graph()
 	graph.add_proxy("invitees", Invitee)
 	graph.add_proxy("invited", Invited)
+	graph.add_proxy("Is", Is)
 	graph.add_proxy("users",User)
+	graph.add_proxy("identities",Identity)
 	graph.scripts.update("traversals.groovy")
 
 	env = Environment(loader=FileSystemLoader('templates')) 
@@ -63,7 +64,7 @@ for logged in users.
 
 It also handles POST requests sent to the root, which is where logins are handled.
 """
-class LandingPageHandler(ClusterHandler):
+class LandingPageHandler(EnclavesHandler):
 
 	"""
 	Handles requests to the root of the site when visiting normally
@@ -110,7 +111,7 @@ class LandingPageHandler(ClusterHandler):
 Destroys existing sessions
 Send a GET to /logout to trigger this Handler
 """
-class LogoutHandler(ClusterHandler):
+class LogoutHandler(EnclavesHandler):
 	def get(self):
 		self.clear_cookie("userid")
 		self.redirect("/")
@@ -118,17 +119,17 @@ class LogoutHandler(ClusterHandler):
 """
 Handler for sending out invitation emails.
 """
-class InviteHandler(ClusterHandler):
+class InviteHandler(EnclavesHandler):
 	"""
 		This loads the invitation creation dialog, for existing users to send invitations
 	"""
-	@ClusterHandler.require_login	
+	@EnclavesHandler.require_login	
 	def get(self):
 		self.write(self.env.get_template("invite.html").render())
 	"""
 	This actually sends out the email when the existing user clicks 'send'
 	"""
-	@ClusterHandler.require_login	
+	@EnclavesHandler.require_login	
 	def post(self):
 
 		currentinvitee = self.graph.invitees.index.lookup(email=self.get_argument("email")) 
@@ -161,7 +162,7 @@ class InviteHandler(ClusterHandler):
 """
 This route handles incoming new users sent from their email to sign-up/?token=[generated token]
 """
-class SignUpHandler(ClusterHandler):
+class SignUpHandler(EnclavesHandler):
 
 	#This checks to make sure the provided token is valid
 	def get(self):
@@ -182,9 +183,9 @@ class SignUpHandler(ClusterHandler):
 		if (invitee is None):
 			self.forbidden()
 		else:
-			newuser = self.graph.users.index.lookup(userid=self.get_argument("userid"))
+			newuser = self.graph.identities.index.lookup(identity=self.get_argument("userid"))
 			if newuser is not None:
-				self.write("Username is taken")
+				self.write("Handle is taken")
 			else:
 				newuser = self.graph.users.create(
 						userid=self.get_argument("userid"),
@@ -195,9 +196,18 @@ class SignUpHandler(ClusterHandler):
 				get_inviter = self.graph.scripts.get('getInviter')
 				inviter = self.graph.gremlin.query(get_inviter, dict(_id=invitee.next().eid)).next()
 				self.graph.invited.create(inviter,newuser)
+
+				# creates an Identity with the same name as the initial username
+				self.graph.Is.create(newuser,self.graph.identities.create(identity=newuser.userid))
+				
 				self.clear_cookie("token")
 				self.clear_cookie("userid")
 				for i in invitee:
 					self.graph.invitees.delete(i.eid)
 
 				self.redirect("/")
+
+
+class SettingsHandler(EnclavesHandler):
+	def get(self):
+		pass
