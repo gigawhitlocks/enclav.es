@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% set title = "Welcome to Cluster!" %}
+{% set title = "Welcome to enclav.es!" %}
 
 {% block content %}
 <form id="invite" action="/sign-up" method="post">
-	Please choose a main username and password (you will be able to choose more display names later):	<br />
+	Please choose a main username and password.<br />
+	This will be your first identity but you will be able to create more identities later.	<br />
 	<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-	Username: <input type="text" name="userid"><br />
-	Password: <input type="password" name="password"><br />
+	Username: <input type="text" name="userid">
+	Password: <input type="password" name="password">
 	<input type="submit">	
 </form>
 
