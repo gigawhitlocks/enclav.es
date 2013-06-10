@@ -31,10 +31,16 @@ class EnclavesHandler(tornado.web.RequestHandler):
 	graph.add_proxy("identities",Identity)
 
 
+
+	graph.add_proxy("posted_by", PostedBy)
 	graph.add_proxy("link_posts",LinkPost)
 
 	graph.scripts.update("traversals.groovy")
 	env = Environment(loader=FileSystemLoader('templates'),extensions=['jinja2.ext.loopcontrols'])
+
+
+	def get_current_user(self):
+		return self.graph.users.get(int(self.get_secure_cookie('eid')))
 
 	"""
 	Checks to see if a user is logged in.
@@ -108,6 +114,7 @@ class LandingPageHandler(EnclavesHandler):
 				if check_password(self.get_argument("password"),user.password):
 					# save the session cookie
 					self.set_secure_cookie("userid", user.userid)
+					self.set_secure_cookie("eid", str(user.eid))
 					self.redirect("/")
 				else:
 					self.write("Username or password was incorrect.\n")
@@ -213,6 +220,7 @@ class SignUpHandler(EnclavesHandler):
 
 class NewPostHandler(EnclavesHandler):
 
+
 	@EnclavesHandler.require_login
 	def get(self):
 		self.write(self.env.get_template('new_post.html').render())
@@ -222,7 +230,11 @@ class NewPostHandler(EnclavesHandler):
 		newpost = self.graph.link_posts.create(
 								title=self.get_argument("title"),
 								url=self.get_argument("url"))
-			
+
+		print(self.get_current_user())
+		self.graph.posted_by.create(newpost, self.get_current_user())	
+		self.redirect("/")
+		
 class SettingsHandler(EnclavesHandler):
 	def get(self):
 		pass

@@ -15,3 +15,5 @@ Enclav.es
 
 When you're done, run ```vagrant suspend``` to pause the VM, and ```vagrant resume``` to restart it.
 
+
+Read [the TO DO](https://github.com/thewhitlockian/enclav.es/blob/master/TODO.markdown) to see what needs to be done.
