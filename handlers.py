@@ -15,6 +15,7 @@ import redis
 import hashlib
 from jinja2 import Environment, FileSystemLoader
 from users import *
+from posts import *
 import smtplib
 from email.parser import Parser
 
@@ -28,8 +29,11 @@ class EnclavesHandler(tornado.web.RequestHandler):
 	graph.add_proxy("Is", Is)
 	graph.add_proxy("users",User)
 	graph.add_proxy("identities",Identity)
-	graph.scripts.update("traversals.groovy")
 
+
+	graph.add_proxy("link_posts",LinkPost)
+
+	graph.scripts.update("traversals.groovy")
 	env = Environment(loader=FileSystemLoader('templates')) 
 
 	"""
@@ -76,7 +80,7 @@ class LandingPageHandler(EnclavesHandler):
 			self.write(landingpage_template.render())
 		else:
 			self.set_header("Content-Type","text/html")
-			header_template =	self.write(self.env.get_template('content.html').render(user=self.get_secure_cookie("userid")))
+			header_template =	self.write(self.env.get_template('content.html').render(posts=self.graph.link_posts.get_all()))
 
 	"""
 	Session stores a cookie with the userID in the browser for persistent sessions.
@@ -207,7 +211,18 @@ class SignUpHandler(EnclavesHandler):
 
 				self.redirect("/")
 
+class NewPostHandler(EnclavesHandler):
 
+	@EnclavesHandler.require_login
+	def get(self):
+		self.write(self.env.get_template('new_post.html').render())
+	
+	@EnclavesHandler.require_login
+	def post(self):
+		newpost = self.graph.link_posts.create(
+								title=self.get_argument("title"),
+								url=self.get_argument("url"))
+			
 class SettingsHandler(EnclavesHandler):
 	def get(self):
 		pass

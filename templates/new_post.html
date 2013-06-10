@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% set title = "Original content is the best content" %}
+
+{% block content %}
+<div class="sixteen columns">
+	<p>
+	Post something cool! Original content is the best content!
+	</p>
+</div>
+<div class="sixteen columns">
+	<form id="new_post" action="/new_post" method="post" style="text-align: left">
+	
+		<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+		Post title:	<input type="text" name="title">
+		URL of link:<input type="text" name="url">
+		<input type="submit" value="Post!" style="margin:0">	
+	</form>
+</div>
+
+{% endblock content %}

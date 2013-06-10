@@ -1,5 +1,12 @@
 a { text-decoration: none}
+body {
+	margin: 0; 
+	padding: 0;
+	background-color:#DDDDDD;
+	color:#333333;
+
+}
 a:link { color: #4E9258 } /* unvisited links */
 a:visited { color: #4E9258 } /* visited links */
-a:hover { text-decoration: underline; } /* user hovers */
+a:hover { color: #DDDDDD; background-color:#4E9258 } /* user hovers */
 a:active { color: #4D7684} /* active links */

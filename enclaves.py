@@ -42,10 +42,11 @@ class Application(tornado.web.Application):
 			  (r"/css/(.*)", tornado.web.StaticFileHandler, {'path': 'static/css'}),
 			  (r"/images/(.*)", tornado.web.StaticFileHandler, {'path': 'static/images'}),
 				(r"/", LandingPageHandler),
-				(r"/sign-up", SignUpHandler),
+				(r"/sign-up", SignUpHandler), #maybe this should be sign_up? I like underscores..
 				(r"/logout", LogoutHandler),
 				(r"/invite", InviteHandler),
-				(r"/settings", SettingsHandler)
+				(r"/settings", SettingsHandler),
+				(r"/new_post", NewPostHandler)
 		]
 		"""
 		#######################################################
@@ -66,6 +67,5 @@ def main():
 #start everything up
 if __name__ == "__main__":
  	#watch for changes and reload the server
-	tornado.autoreload.watch('templates/landingpage.html')
 	tornado.autoreload.start()
 	main()

@@ -11,8 +11,8 @@ class Post(Node):
 	# when was it created?
 	created = DateTime(default=current_datetime, nullable=False)
 
-	# to what enclave was it posted?
-	enclave = String(nullable=True, default=None)
+	# title of the post?
+	title = String(nullable=False)
 
 
 """

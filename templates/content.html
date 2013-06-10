@@ -5,4 +5,10 @@
 
 {% block content %}
 
+<ul>
+{% for link in posts|reverse %}
+	<li><a href="{{link.url}}" target="_blank">{{link.title}}</a></li>
+{% endfor %}
+</ul>
+
 {% endblock content %}

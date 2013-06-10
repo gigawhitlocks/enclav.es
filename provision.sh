@@ -9,7 +9,7 @@ apt-get install oracle-java6-installer -y;
 
 
 # symlink the project directory somewhere more convenient
-ln -s /vagrant/ /home/vagrant/cluster;
+ln -s /vagrant/ /home/vagrant/enclav.es;
 
 ##############
 #INSTALL REQUIRED PACKAGES
@@ -19,10 +19,10 @@ apt-get install sendmail git zip python-pip screen make bpython expect -y -q;
 ##############
 #INSTALL PYTHON DEPS.
 #IF NEW DEPS ARE INSTALLED OR REMOVED AFTER INSTALLATION/REMOVAL DO
-#pip freeze > /home/vagrant/cluster/requirements.txt
+#pip freeze > /home/vagrant/enclav.es/requirements.txt
 #AND COMMIT NEW CHANGES TO KEEP TRACK OF THESE DEPENDENCIES
 #############
-pip install -r /home/vagrant/cluster/requirements.txt
+pip install -r /home/vagrant/enclav.es/requirements.txt
 
 
 echo "Downloading Neo4j..";

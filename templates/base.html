@@ -13,18 +13,14 @@
 		<link rel="stylesheet" href="css/custom.css">
 		
 		<style type="text/css">
-			body {margin: 0; padding: 0;
-				background-color:#DDDDDD;
-				color:#333333;
 
-			}
 
-			#nav {
+			.nav {
 				text-align: center;
 				float: right;
 			}
 
-			#nav li{
+			.nav li{
 				margin-right: 10px;
 				float: left;
 				display:block;
@@ -57,10 +53,12 @@
 					<h3><a href="/">enclav.es</a></h3>
 				</div>
 				<div class="six columns">
-					<ul id="nav">
+					<ul id="nav" class="nav">
 						<li><a href="/invite">Invite</a></li>
 						<li><a href="/settings">Settings</a></li>
-						<li style="margin-right:0"><a href="/logout">Log out</a></li>
+						<li style="margin-right:0"><a href="/logout">Log out</a></li><br />
+						<li><a href="/new_post">Create new post</a></li>
+						<li><a href="/create_enclave">Start an enclave</a></li>
 					</ul>
 				</div>
 				{% endblock pageheader %}
