@@ -8,9 +8,6 @@ as a parent class for the other Post types for shared values
 """
 class Post(Node):
 	
-	# who created this Post?
-	author = String(nullable=False)
-
 	# when was it created?
 	created = DateTime(default=current_datetime, nullable=False)
 
@@ -23,6 +20,11 @@ Similar to a "self-post" on Reddit.
 """
 class TextPost(Post):
 	element_type = "text_post"
+	body_text = String(nullable=False)
+
+
+class Comment(TextPost):
+	element_type = "comment"
 
 """
 Same as a link post on Reddit,
@@ -48,7 +50,7 @@ class ImagePost(LinkPost):
 """
 Not exactly sure how we want to handle Video & Audio
 posts but we do want to differentiate them for sorting
-
+teebs
 Specifically for Videos
 """
 class VideoPost(LinkPost):
@@ -59,3 +61,27 @@ Specifically for Audio
 """
 class AudioPost(LinkPost):
 	element_type = "audio_post"
+
+
+
+"""Relationship defining who posted what
+Comment--posted_by-->Identity OR
+Post--posted_by-->Identity
+"""
+class PostedBy(Relationship):
+	label = "posted_by"
+	created = DateTime(default=current_datetime, nullable=False)
+
+"""Relationship defining to what enclave a post is posted
+Post--posted_to-->Enclave
+"""
+class PostedTo(Relationship):
+	label = "posted_to"
+	created = DateTime(default=current_datetime, nullable=False)
+
+"""Relationship for threading conversations
+Post--has_reply-->Comment OR 
+Comment--HasReply-->Comment"""
+class HasReply(Relationship):
+	label = "has_reply"
+	created = DateTime(default=current_datetime, nullable=False)
