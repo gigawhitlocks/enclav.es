@@ -40,6 +40,7 @@ class Application(tornado.web.Application):
 		"""
 		handlers = [
 			  (r"/css/(.*)", tornado.web.StaticFileHandler, {'path': 'static/css'}),
+			  (r"/images/(.*)", tornado.web.StaticFileHandler, {'path': 'static/images'}),
 				(r"/", LandingPageHandler),
 				(r"/sign-up", SignUpHandler),
 				(r"/logout", LogoutHandler),

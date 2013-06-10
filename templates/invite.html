@@ -2,11 +2,19 @@
 {% set title = "Invite someone to Cluster!" %}
 
 {% block content %}
-<form id="invite" action="/invite" method="post">
+<div class="ten columns">
+	<p>
+		This form will allow you to send an invitation to a new user. Please invite wisely and only send invitations to those you believe will add value to our community. If you invite a troll, a spammer, a bot, or an asshole, you may be punished for the wrongdoing of your invitee.
+	</p>
+</div>
+<div class="six columns">
+	<form id="invite" action="/invite" method="post" style="text-align: right">
 	
-	<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-	<input type="text" name="email">
-	<input type="submit">	
-</form>
+		<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+		<h4>Email Address of Recipient:</h4>
+		<input type="text" name="email" style="display:inline;margin-bottom:5px">
+		<input type="submit" value="Invite" style="margin:0">	
+	</form>
+</div>
 
 {% endblock content %}
