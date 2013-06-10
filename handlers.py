@@ -34,7 +34,7 @@ class EnclavesHandler(tornado.web.RequestHandler):
 	graph.add_proxy("link_posts",LinkPost)
 
 	graph.scripts.update("traversals.groovy")
-	env = Environment(loader=FileSystemLoader('templates')) 
+	env = Environment(loader=FileSystemLoader('templates'),extensions=['jinja2.ext.loopcontrols'])
 
 	"""
 	Checks to see if a user is logged in.

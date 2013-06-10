@@ -9,4 +9,19 @@ body {
 a:link { color: #4E9258 } /* unvisited links */
 a:visited { color: #4E9258 } /* visited links */
 a:hover { color: #DDDDDD; background-color:#4E9258 } /* user hovers */
-a:active { color: #4D7684} /* active links */
+a:active { color: #DDDDDD; background-color: red} /* active links */
+
+.header {
+
+	padding-top: 10px;
+	margin-bottom: 10px;
+	padding-bottom: -10px;
+	width: 100%;
+	background-color:#4E9258;
+	color:#DDDDDD;
+
+}
+.header a:link { color: #DDDDDD } /* unvisited links */
+.header a:visited { color: #DDDDDD } /* visited links */
+.header a:hover { color: #4E9258; background-color:#DDDDDD } /* user hovers */
+.header a:active { color: #DDDDDD; background-color: red} /* active links */
