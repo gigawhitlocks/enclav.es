@@ -25,3 +25,7 @@ a:active { color: #DDDDDD; background-color: red} /* active links */
 .header a:visited { color: #DDDDDD } /* visited links */
 .header a:hover { color: #4E9258; background-color:#DDDDDD } /* user hovers */
 .header a:active { color: #DDDDDD; background-color: red} /* active links */
+
+label {
+	display: inline;
+}

@@ -57,8 +57,6 @@ class Identity(Node):
 	element_type = "identity"
 	identity = String(nullable=False)
 
-
-
 # Identity --subscribes_to--> Enclave OR
 # Identity --is_member_of--> Enclave when there is a distinction
 class SubscribesTo(Relationship):

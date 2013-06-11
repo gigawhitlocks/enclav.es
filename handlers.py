@@ -39,6 +39,15 @@ class EnclavesHandler(tornado.web.RequestHandler):
 	env = Environment(loader=FileSystemLoader('templates'),extensions=['jinja2.ext.loopcontrols'])
 
 
+	"""
+	Shorthand for rendering templates (pretty self-explanatory)
+	"""
+	def render_template(self, template_name):
+		self.write(self.env.get_template(template_name).render())
+
+	"""
+	Looks up the current user as stored in a cookie in the Graph
+	"""
 	def get_current_user(self):
 		return self.graph.users.get(int(self.get_secure_cookie('eid')))
 
@@ -82,11 +91,20 @@ class LandingPageHandler(EnclavesHandler):
 	"""
 	def get(self):
 		if(not self.is_logged_in()):
-			landingpage_template = self.env.get_template('landingpage.html')
-			self.write(landingpage_template.render())
+			render_template("landingpage.html")
+
 		else:
-			self.set_header("Content-Type","text/html")
-			header_template =	self.write(self.env.get_template('content.html').render(posts=self.graph.link_posts.get_all()))
+			posts=[]
+			i=0
+			for post in self.graph.link_posts.get_all():
+				if i > 20:
+					break
+				else:
+					i+=1
+				get_poster = self.graph.scripts.get('getPoster')
+				posts.append([post, self.graph.gremlin.query(get_poster, dict(_id=post.eid)).next().userid])
+
+			self.write(self.env.get_template('content.html').render(posts=posts))
 
 	"""
 	Session stores a cookie with the userID in the browser for persistent sessions.
@@ -125,6 +143,7 @@ Send a GET to /logout to trigger this Handler
 class LogoutHandler(EnclavesHandler):
 	def get(self):
 		self.clear_cookie("userid")
+		self.clear_cookie("eid")
 		self.redirect("/")
 
 """
@@ -136,7 +155,9 @@ class InviteHandler(EnclavesHandler):
 	"""
 	@EnclavesHandler.require_login	
 	def get(self):
-		self.write(self.env.get_template("invite.html").render())
+		render_template("invite.html")
+
+
 	"""
 	This actually sends out the email when the existing user clicks 'send'
 	"""
@@ -160,9 +181,9 @@ class InviteHandler(EnclavesHandler):
 
 		## build the email and send it. SMTP host is localhost for now.
 		s = smtplib.SMTP('localhost')
-		headers = Parser().parsestr('From: <noreply@cluster.im>\n'
+		headers = Parser().parsestr('From: <noreply@enclav.es)\n'
         'To: <'+ self.get_argument("email") +'>\n'
-        'Subject: You have been invited to Cluster.im\n'
+        'Subject: You have been invited to enclav.es\n'
         '\n'
 				## TODO: Write out a better invite email
 				'Click here to accept the invitation: http://localhost:8080/sign-up?token='+currentinvitee.token+'\n')
@@ -183,7 +204,7 @@ class SignUpHandler(EnclavesHandler):
 		else:
 			## If the token is valid load the new user form
 			self.set_secure_cookie("token",self.get_argument("token"))
-			self.write(self.env.get_template('sign-up.html').render())
+			render_template("sign-up.html")
 			## TODO: also check expiry on token
 
 
@@ -213,6 +234,7 @@ class SignUpHandler(EnclavesHandler):
 				
 				self.clear_cookie("token")
 				self.clear_cookie("userid")
+				self.clear_cookie("eid")
 				for i in invitee:
 					self.graph.invitees.delete(i.eid)
 
@@ -223,7 +245,7 @@ class NewPostHandler(EnclavesHandler):
 
 	@EnclavesHandler.require_login
 	def get(self):
-		self.write(self.env.get_template('new_post.html').render())
+		render_template("new_post.html")
 	
 	@EnclavesHandler.require_login
 	def post(self):
@@ -237,4 +259,4 @@ class NewPostHandler(EnclavesHandler):
 		
 class SettingsHandler(EnclavesHandler):
 	def get(self):
-		pass
+		pass	

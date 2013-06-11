@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% set title = "Original content is the best content" %}
 
+{% block header %}
+<script type='text/javascript'>
+	$("document").ready(function() {
+		$("#text").load('/');
+
+	});
+</script>
+
+{% endblock header %}
+
 {% block content %}
 <div class="sixteen columns">
 	<p>
@@ -8,8 +18,16 @@
 	</p>
 </div>
 <div class="sixteen columns">
+	<form id="switch_form">Post Type:
+		<input type="radio" id="text" name="post_type">
+		<label for="text">Text</label></input>
+		<input type="radio" id="link" name="post_type">
+		<label for="link" checked="checked">Link</label></input>
+		<input type="radio" id="image" name="post_type">
+		<label for="image">Image</label></input>
+	</form>
+
 	<form id="new_post" action="/new_post" method="post" style="text-align: left">
-	
 		<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 		Post title:	<input type="text" name="title">
 		URL of link:<input type="text" name="url">

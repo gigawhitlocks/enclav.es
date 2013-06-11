@@ -7,8 +7,8 @@
 
 <ul>
 	{% for link in posts|reverse %}
-	{% if loop.index > 20 %} {% break %}{% endif %}
-		<li><h4><a href="{{link.url}}" target="_blank">{{link.title}}</a></h4></li>
+	<li><h4><a href="{{link[0].url}}" target="_blank">{{link[0].title}}</a></h4>
+	Posted by <a href="/u/{{link[1]}}">{{link[1]}}</a> at {{link[0].created}}</li>
 	{% endfor %}
 </ul>
 

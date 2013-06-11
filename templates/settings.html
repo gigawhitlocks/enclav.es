@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% set title = "Change User Settings" %}
+
+{% block header %}
+{% endblock header %}
+
+{% block content %}
+<div class="sixteen columns">
+
+	<h2>User Settings</h2>
+
+	Current Identities:
+	<!-- list current identities -->
+
+	<form id="identity" action="/settings" method="post">
+		<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+		<label for="new_identity">Create a new identity with handle:</label>
+		<input type="text" name="new_identity" />
+		<input type="submit" value="Create!" />
+	</form>
+	<hr />
+</div>
+{% endblock content %}
