@@ -18,8 +18,7 @@ from random import random
 from bulbs.neo4jserver import Graph
 from bulbs.model import Node, Relationship
 from bulbs.property import String, DateTime, Integer
-from users import User, check_password
-
+from users import User
 """
 
 This file contains a few things:
@@ -43,29 +42,26 @@ class Application(tornado.web.Application):
       "xsrf_cookies": False
     }
 
-    """
     #######################################################
-    THIS IS WHERE ROUTES ARE DEFINED.
-    May want to move these elsewhere at some point,
-    but for now let's just highlight them with this comment.
+    #THIS IS WHERE ROUTES ARE DEFINED.
+    #May want to move these elsewhere at some point,
+    #but for now let's just highlight them with this comment.
     #######################################################
-    """
     handlers = [
         (r"/css/(.*)", tornado.web.StaticFileHandler, {'path': 'static/css'}),
         (r"/images/(.*)", tornado.web.StaticFileHandler, {'path': 'static/images'}),
         (r"/js/(.*)", tornado.web.StaticFileHandler, {'path': 'static/js'}),
         (r"/", LandingPageHandler),
+        (r"/forgot_password", ForgotPassHandler),
         (r"/sign-up", SignUpHandler), #maybe this should be sign_up? I like underscores..
         (r"/logout", LogoutHandler),
         (r"/invite", InviteHandler),
         (r"/settings", SettingsHandler),
         (r"/new_post", NewPostHandler)
     ]
-    """
     #######################################################
-    Also with this comment
+    #Also with this comment
     #######################################################
-    """
     
 
 

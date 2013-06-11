@@ -14,6 +14,7 @@ import hashlib
 from jinja2 import Environment, FileSystemLoader
 from users import *
 from posts import *
+from hashing_passwords import make_hash as generate_storable_password, check_hash
 import smtplib
 from email.parser import Parser
 
@@ -65,16 +66,18 @@ class EnclavesHandler(tornado.web.RequestHandler):
         self.set_status(403)
         self.finish("<html><body><h3>403 That is not permitted</h3></body></html>")
 
-    """
-    Use as a decorator around functions that require the user be logged in
-    """
     @staticmethod
     def require_login(function, *args, **kwargs):
+        """
+        Use as a decorator around functions that require the user be logged in
+        """
         def new_function(self):
             if (not self.is_logged_in()):
                 self.forbidden()
             function(self, *args, **kwargs)
         return new_function
+
+
 class LandingPageHandler(EnclavesHandler):
     """
     LandingPageHandler handles all requests sent to the root of the domain.
@@ -119,7 +122,7 @@ class LandingPageHandler(EnclavesHandler):
             else :
 
                 # check that password is correct
-                if check_password(self.get_argument("password"),user.password):
+                if check_hash(self.get_argument("password"),user.password):
                     # save the session cookie
                     self.set_secure_cookie("userid", user.userid)
                     self.set_secure_cookie("eid", str(user.eid))
@@ -252,9 +255,11 @@ class SettingsHandler(EnclavesHandler):
       """Returns a generator that will provide all identities for the current user"""
       return self.graph.gremlin.query(self.graph.scripts.get('getIdentities'), dict(_id=self.get_current_user().eid)) 
 
+    @EnclavesHandler.require_login
     def get(self):
         self.render_template("settings.html", identities=self.get_identities())
 
+    @EnclavesHandler.require_login
     def post(self):
 
         # Creates new Identities
@@ -269,3 +274,7 @@ class SettingsHandler(EnclavesHandler):
                 self.graph.Is.create(self.get_current_user(),new_identity)
                 self.redirect("/settings")
 
+class ForgotPassHandler(EnclavesHandler):
+
+    def get(self):
+        self.write("Sucks.") #TODO: Implement forgot password utility
