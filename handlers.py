@@ -91,7 +91,7 @@ class LandingPageHandler(EnclavesHandler):
 	"""
 	def get(self):
 		if(not self.is_logged_in()):
-			render_template("landingpage.html")
+			self.render_template("landingpage.html")
 
 		else:
 			posts=[]
@@ -155,7 +155,7 @@ class InviteHandler(EnclavesHandler):
 	"""
 	@EnclavesHandler.require_login	
 	def get(self):
-		render_template("invite.html")
+		self.render_template("invite.html")
 
 
 	"""
@@ -204,7 +204,7 @@ class SignUpHandler(EnclavesHandler):
 		else:
 			## If the token is valid load the new user form
 			self.set_secure_cookie("token",self.get_argument("token"))
-			render_template("sign-up.html")
+			self.render_template("sign-up.html")
 			## TODO: also check expiry on token
 
 
@@ -245,7 +245,7 @@ class NewPostHandler(EnclavesHandler):
 
 	@EnclavesHandler.require_login
 	def get(self):
-		render_template("new_post.html")
+		self.render_template("new_post.html")
 	
 	@EnclavesHandler.require_login
 	def post(self):
