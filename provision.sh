@@ -2,7 +2,7 @@
 
 
 # install java
-apt-get install python-software-properties make -y -q;
+apt-get install python-software-properties make python-dev -y -q;
 add-apt-repository ppa:webupd8team/java;
 apt-get update -y -q;
 apt-get install oracle-java6-installer -y;
