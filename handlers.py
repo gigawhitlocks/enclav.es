@@ -9,8 +9,6 @@ import tornado.web
 from tornado.options import define, options
 
 from bulbs.neo4jserver import Graph
-import redis
-
 
 import hashlib
 from jinja2 import Environment, FileSystemLoader
@@ -41,9 +39,10 @@ class EnclavesHandler(tornado.web.RequestHandler):
 
 	"""
 	Shorthand for rendering templates (pretty self-explanatory)
+	**kwargs is used for passing key=value variables to the template for rendering as {{variable}} in jinja2
 	"""
-	def render_template(self, template_name):
-		self.write(self.env.get_template(template_name).render())
+	def render_template(self, template_name, **kwargs):
+		self.write(self.env.get_template(template_name).render(**kwargs))
 
 	"""
 	Looks up the current user as stored in a cookie in the Graph
@@ -64,7 +63,7 @@ class EnclavesHandler(tornado.web.RequestHandler):
 	def forbidden(self):
 		self.clear()
 		self.set_status(403)
-		self.finish("<html><body><h3>403 That is not permitted</h1></body></html>")
+		self.finish("<html><body><h3>403 That is not permitted</h3></body></html>")
 
 	"""
 	Use as a decorator around functions that require the user be logged in
@@ -104,16 +103,7 @@ class LandingPageHandler(EnclavesHandler):
 				get_poster = self.graph.scripts.get('getPoster')
 				posts.append([post, self.graph.gremlin.query(get_poster, dict(_id=post.eid)).next().userid])
 
-			self.write(self.env.get_template('content.html').render(posts=posts))
-
-	"""
-	Session stores a cookie with the userID in the browser for persistent sessions.
-	The redis bit is half-implemented.
-	TODO: determine if server-side sessions are really even necessary
-	"""
-	def session(self):
-		sessionid = self.get_secure_cookie('sid')
-		return Session(self.application.session_store, sessionid)
+			self.render_template('content.html', posts=posts)
 
 	"""
 	# handles POST requests sent to /
@@ -241,8 +231,7 @@ class SignUpHandler(EnclavesHandler):
 				self.redirect("/")
 
 class NewPostHandler(EnclavesHandler):
-
-
+	
 	@EnclavesHandler.require_login
 	def get(self):
 		self.render_template("new_post.html")
@@ -258,5 +247,8 @@ class NewPostHandler(EnclavesHandler):
 		self.redirect("/")
 		
 class SettingsHandler(EnclavesHandler):
+
 	def get(self):
-		pass	
+		self.render_template("settings.html")
+
+
