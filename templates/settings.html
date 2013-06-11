@@ -6,16 +6,18 @@
 
 {% block content %}
 <div class="sixteen columns">
-
 	<h2>User Settings</h2>
+</div>
+<div class="six columns">
 		<ul>
-				Current Identities:
+			<h4>Current Identities:</h4>
 				{% for i in identities %}
 						<!-- list current identities -->
 						<li>{{ i.identity }}</li>
 				{% endfor %}
 		</ul>
-
+	</div>
+	<div class="six columns">
 
 	<form id="identity" action="/settings" method="post">
 		<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">

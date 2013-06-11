@@ -260,11 +260,12 @@ class SettingsHandler(EnclavesHandler):
         # Creates new Identities
         desired_identity = self.get_argument("new_identity")
         if desired_identity is not None:
-            new_identity = self.graph.identities.lookup(identity=desired_identity)  
+            new_identity = self.graph.identities.index.lookup(identity=desired_identity)  
             if new_identity is not None: #identity is taken
               self.write("Identity is taken.")
               self.redirect("/settings")
             else: #identity is available
                 new_identity = self.graph.identities.create(identity=desired_identity)
                 self.graph.Is.create(self.get_current_user(),new_identity)
+                self.redirect("/settings")
 

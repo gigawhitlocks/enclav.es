@@ -53,6 +53,7 @@ class Application(tornado.web.Application):
     handlers = [
         (r"/css/(.*)", tornado.web.StaticFileHandler, {'path': 'static/css'}),
         (r"/images/(.*)", tornado.web.StaticFileHandler, {'path': 'static/images'}),
+        (r"/js/(.*)", tornado.web.StaticFileHandler, {'path': 'static/js'}),
         (r"/", LandingPageHandler),
         (r"/sign-up", SignUpHandler), #maybe this should be sign_up? I like underscores..
         (r"/logout", LogoutHandler),
