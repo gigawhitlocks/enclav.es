@@ -16,7 +16,19 @@ import hashlib
 from random import random
 
 from bulbs.neo4jserver import Graph
+from bulbs.model import Node, Relationship
+from bulbs.property import String, DateTime, Integer
 from users import User, check_password
+
+"""
+
+This file contains a few things:
+	-The main method and Application class, along with runtime configs
+	-Routing table
+	-The Enclave object and related, to stick to the users.py posts.py etc naming scheme
+
+"""
+
 
 
 #define port for the server to run on
@@ -69,3 +81,23 @@ if __name__ == "__main__":
  	#watch for changes and reload the server
 	tornado.autoreload.start()
 	main()
+
+
+
+#Enclave object and related are below
+class Enclave(Node):
+	created = DateTime(default=current_datetime, nullable=False)
+	name = String(nullable=False)
+
+	#gov_type will define government type for a given Enclave
+	#Will hopefully eventually include Monarchy and Democracy at least
+	#If not some combinations as well
+	gov_type = String(nullable=False, default="monarchy")
+
+	#determines whether or not subscribers can post
+	membership_required = Integer(nullable=False, default=0)
+
+	#determines whether posts in the enclave are visible to the wider community
+	#when set to 1, membership_required is assumed to be 1
+	private = Integer(nullable=False, default=0)
+	
