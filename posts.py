@@ -2,7 +2,7 @@ from bulbs.model import Node, Relationship
 from bulbs.property import String, Integer, DateTime
 from bulbs.utils import current_datetime
 
-class post(node):
+class Post(Node):
     """
     don't instantiate a plain post. this just serves
     as a parent class for the other post types for shared values

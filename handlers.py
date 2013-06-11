@@ -248,8 +248,12 @@ class NewPostHandler(EnclavesHandler):
         
 class SettingsHandler(EnclavesHandler):
 
+    def get_identities(self):
+      """Returns a generator that will provide all identities for the current user"""
+      return self.graph.gremlin.query(self.graph.scripts.get('getIdentities'), dict(_id=self.get_current_user().eid)) 
+
     def get(self):
-        self.render_template("settings.html")
+        self.render_template("settings.html", identities=self.get_identities())
 
     def post(self):
 
@@ -257,4 +261,10 @@ class SettingsHandler(EnclavesHandler):
         desired_identity = self.get_argument("new_identity")
         if desired_identity is not None:
             new_identity = self.graph.identities.lookup(identity=desired_identity)  
-            pass
+            if new_identity is not None: #identity is taken
+              self.write("Identity is taken.")
+              self.redirect("/settings")
+            else: #identity is available
+                new_identity = self.graph.identities.create(identity=desired_identity)
+                self.graph.Is.create(self.get_current_user(),new_identity)
+

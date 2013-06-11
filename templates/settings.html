@@ -8,9 +8,14 @@
 <div class="sixteen columns">
 
 	<h2>User Settings</h2>
+		<ul>
+				Current Identities:
+				{% for i in identities %}
+						<!-- list current identities -->
+						<li>{{ i.identity }}</li>
+				{% endfor %}
+		</ul>
 
-	Current Identities:
-	<!-- list current identities -->
 
 	<form id="identity" action="/settings" method="post">
 		<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
