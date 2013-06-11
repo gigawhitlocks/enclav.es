@@ -34,14 +34,14 @@ def check_password(raw_input, hash):
 Hashes a plaintext password into a secure storable hash
 """
 def generate_storable_password(raw_password):
-        version_number = 1
-        salt = generate_salt()
-        pword = salt+raw_password
-        times_hashed = 0
-        for i in range(0, random.randint(5,10)):
-            times_hashed += 1 
-            pword = hashlib.sha256(pword).hexdigest()
-        return "%s$%s$%s$%s" %(version_number, times_hashed, salt, pword)
+    version_number = 1
+    salt = generate_salt()
+    pword = salt+raw_password
+    times_hashed = 0
+    for i in range(0, random.randint(5,10)):
+        times_hashed += 1 
+        pword = hashlib.sha256(pword).hexdigest()
+    return "%s$%s$%s$%s" %(version_number, times_hashed, salt, pword)
 
 # pretty self-explanatory
 class User(Node):

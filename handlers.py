@@ -37,17 +37,17 @@ class EnclavesHandler(tornado.web.RequestHandler):
     env = Environment(loader=FileSystemLoader('templates'),extensions=['jinja2.ext.loopcontrols'])
 
 
-    """
-    Shorthand for rendering templates (pretty self-explanatory)
-    **kwargs is used for passing key=value variables to the template for rendering as {{variable}} in jinja2
-    """
     def render_template(self, template_name, **kwargs):
+        """
+        Shorthand for rendering templates (pretty self-explanatory)
+        **kwargs is used for passing key=value variables to the template for rendering as {{variable}} in jinja2
+        """
         self.write(self.env.get_template(template_name).render(**kwargs))
 
-    """
-    Looks up the current user as stored in a cookie in the Graph
-    """
     def get_current_user(self):
+        """
+        Looks up the current user as stored in a cookie in the Graph
+        """
         return self.graph.users.get(int(self.get_secure_cookie('eid')))
 
     """
@@ -75,20 +75,20 @@ class EnclavesHandler(tornado.web.RequestHandler):
                 self.forbidden()
             function(self, *args, **kwargs)
         return new_function
-"""
-LandingPageHandler handles all requests sent to the root of the domain.
-This means displaying a login page when no user is logged in and the home page
-for logged in users.
-
-It also handles POST requests sent to the root, which is where logins are handled.
-"""
 class LandingPageHandler(EnclavesHandler):
+    """
+    LandingPageHandler handles all requests sent to the root of the domain.
+    This means displaying a login page when no user is logged in and the home page
+    for logged in users.
 
+    It also handles POST requests sent to the root, which is where logins are handled.
     """
-    Handles requests to the root of the site when visiting normally
-    (GET requests)
-    """
+
     def get(self):
+        """
+        Handles requests to the root of the site when visiting normally
+        (GET requests)
+        """
         if(not self.is_logged_in()):
             self.render_template("landingpage.html")
 
@@ -105,11 +105,11 @@ class LandingPageHandler(EnclavesHandler):
 
             self.render_template('content.html', posts=posts)
 
-    """
-    # handles POST requests sent to /
-    # Generally these are login requests
-    """
     def post(self):
+        """
+        # handles POST requests sent to /
+        # Generally these are login requests
+        """
         if ( not self.is_logged_in() ):
             # open database and look up input username
             self.set_header("Content-Type", "text/html")
@@ -126,33 +126,33 @@ class LandingPageHandler(EnclavesHandler):
                     self.redirect("/")
                 else:
                     self.write("Username or password was incorrect.\n")
-"""
-Destroys existing sessions
-Send a GET to /logout to trigger this Handler
-"""
 class LogoutHandler(EnclavesHandler):
+    """
+    Destroys existing sessions
+    Send a GET to /logout to trigger this Handler
+    """
     def get(self):
         self.clear_cookie("userid")
         self.clear_cookie("eid")
         self.redirect("/")
 
-"""
-Handler for sending out invitation emails.
-"""
 class InviteHandler(EnclavesHandler):
     """
-        This loads the invitation creation dialog, for existing users to send invitations
+    Handler for sending out invitation emails.
     """
     @EnclavesHandler.require_login  
     def get(self):
+        """
+        This loads the invitation creation dialog, for existing users to send invitations
+        """
         self.render_template("invite.html")
 
 
-    """
-    This actually sends out the email when the existing user clicks 'send'
-    """
     @EnclavesHandler.require_login  
     def post(self):
+        """
+        This actually sends out the email when the existing user clicks 'send'
+        """
 
         currentinvitee = self.graph.invitees.index.lookup(email=self.get_argument("email")) 
         # check to see if this email has already been invited. If it has, remove all of its previos occurrences
@@ -181,13 +181,13 @@ class InviteHandler(EnclavesHandler):
         s.sendmail(headers['from'],[headers['to']],headers.as_string())
         self.redirect("/invite")
 
-"""
-This route handles incoming new users sent from their email to sign-up/?token=[generated token]
-"""
 class SignUpHandler(EnclavesHandler):
+    """
+    This route handles incoming new users sent from their email to sign-up/?token=[generated token]
+    """
 
-    #This checks to make sure the provided token is valid
     def get(self):
+        """This checks to make sure the provided token is valid"""
         currentinvitee = self.graph.invitees.index.lookup(token=self.get_argument("token"))
         if ( currentinvitee is None ) :
             self.redirect("/")
@@ -198,8 +198,8 @@ class SignUpHandler(EnclavesHandler):
             ## TODO: also check expiry on token
 
 
-    #This processes the new user form and creates the new user if the username isn't taken already  
     def post(self):
+        """This processes the new user form and creates the new user if the username isn't taken already"""
         
         invitee = self.graph.invitees.index.lookup(token=self.get_secure_cookie("token"))
         if (invitee is None):
