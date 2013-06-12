@@ -12,7 +12,7 @@ a:hover { color: #DDDDDD; background-color:#4E9258 } /* user hovers */
 a:active { color: #DDDDDD; background-color: red} /* active links */
 
 .header {
-
+	padding: 0;
 	padding-top: 10px;
 	margin-bottom: 10px;
 	padding-bottom: -10px;

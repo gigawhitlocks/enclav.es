@@ -12,8 +12,11 @@ from bulbs.neo4jserver import Graph
 
 import hashlib
 from jinja2 import Environment, FileSystemLoader
+
 from users import *
 from posts import *
+from enclaves import *
+
 from hashing_passwords import make_hash as generate_storable_password, check_hash
 import smtplib
 from email.parser import Parser
@@ -22,17 +25,21 @@ import uuid
 
 
 class EnclavesHandler(tornado.web.RequestHandler):
+
+    # objects
     graph = Graph()
     graph.add_proxy("invitees", Invitee)
-    graph.add_proxy("invited", Invited)
-    graph.add_proxy("Is", Is)
     graph.add_proxy("users",User)
     graph.add_proxy("identities",Identity)
-
-
-
-    graph.add_proxy("posted_by", PostedBy)
     graph.add_proxy("link_posts",LinkPost)
+    graph.add_proxy("enclaves", Enclave)
+
+    #relationships
+    graph.add_proxy("posted_by", PostedBy)
+    graph.add_proxy("invited", Invited)
+    graph.add_proxy("Is", Is)
+    graph.add_proxy("moderates", Moderates)
+    graph.add_proxy("owns", owns)
 
     graph.scripts.update("traversals.groovy")
     env = Environment(loader=FileSystemLoader('templates'),extensions=['jinja2.ext.loopcontrols'])
@@ -51,20 +58,26 @@ class EnclavesHandler(tornado.web.RequestHandler):
         """
         return self.graph.users.get(int(self.get_secure_cookie('eid')))
 
-    """
-    Checks to see if a user is logged in.
-    """
     def is_logged_in(self):
+        """
+        Checks to see if a user is logged in.
+        """
         return self.get_secure_cookie("userid") != None
 
 
-    """
-    Use for throwing a 403 when a user does something that is not permitted
-    """
     def forbidden(self):
+        """
+        Use for throwing a 403 when a user does something that is not permitted
+        """
         self.clear()
         self.set_status(403)
         self.finish("<html><body><h3>403 That is not permitted</h3></body></html>")
+
+    def get_poster(self, post):
+        """ returns the poster of post """
+        # .next() is safe here because any post will only have one poster
+        return self.graph.gremlin.query(self.graph.scripts.get('getNeighboringVertices'),
+                dict(_id=post.eid,relationship="posted_by",direction="out")).next()
 
     @staticmethod
     def require_login(function, *args, **kwargs):
@@ -103,8 +116,7 @@ class LandingPageHandler(EnclavesHandler):
                     break
                 else:
                     i+=1
-                get_poster = self.graph.scripts.get('getPoster')
-                posts.append([post, self.graph.gremlin.query(get_poster, dict(_id=post.eid)).next().userid])
+                posts.append([post, self.get_poster(post).userid])
 
             self.render_template('content.html', posts=posts)
 
@@ -234,6 +246,7 @@ class SignUpHandler(EnclavesHandler):
                 self.redirect("/")
 
 class NewPostHandler(EnclavesHandler):
+    """Handles creation of new posts"""
     
     @EnclavesHandler.require_login
     def get(self):
@@ -261,7 +274,6 @@ class SettingsHandler(EnclavesHandler):
 
     @EnclavesHandler.require_login
     def post(self):
-
         # Creates new Identities
         desired_identity = self.get_argument("new_identity")
         if desired_identity is not None:
@@ -278,3 +290,32 @@ class ForgotPassHandler(EnclavesHandler):
 
     def get(self):
         self.write("Sucks.") #TODO: Implement forgot password utility
+
+
+class NewEnclaveHandler(EnclavesHandler):
+    """Handles creation of enclaves"""
+
+    @EnclavesHandler.require_login
+    def get(self):
+        self.render_template('new_enclave.html')
+
+
+    @EnclavesHandler.require_login
+    def post(self):
+        desired_enclave = self.graph.enclaves.index.lookup(name=self.get_argument("name"))
+        request = self.request
+        print(self.get_argument('privacy'))
+
+        if desired_enclave is not None:
+            self.write("This enclave already exists. Please choose a new name.")
+
+        else:
+            print(self.request.arguments)
+            desired_enclave = self.graph.enclaves.create(name=self.get_argument("name"),
+                                                         privacy=self.get_argument("privacy"))
+
+            # current user - moderates -> new enclave
+            self.graph.moderates.create(self.get_current_user(),desired_enclave)
+
+            # current user - owns -> new enclave
+            self.graph.owns.create(self.get_current_user(),desired_enclave)

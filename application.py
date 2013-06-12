@@ -57,6 +57,7 @@ class Application(tornado.web.Application):
         (r"/logout", LogoutHandler),
         (r"/invite", InviteHandler),
         (r"/settings", SettingsHandler),
+        (r"/create_enclave", NewEnclaveHandler),
         (r"/new_post", NewPostHandler)
     ]
     #######################################################

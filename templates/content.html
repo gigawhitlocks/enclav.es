@@ -1,15 +1,14 @@
 {% extends "base.html" %}
-{% set title = 'Home' %}
 
 
 
 {% block content %}
-
-<ul>
-	{% for link in posts|reverse %}
-	<li><h4><a href="{{link[0].url}}" target="_blank">{{link[0].title}}</a></h4>
-	Posted by <a href="/u/{{link[1]}}">{{link[1]}}</a> at {{link[0].created}}</li>
-	{% endfor %}
-</ul>
-
+<div class="sixteen columns">
+	<ul>
+		{% for link in posts|reverse %}
+		<li><h4><a href="{{link[0].url}}" target="_blank">{{link[0].title}}</a></h4>
+		Posted by <a href="/u/{{link[1]}}">{{link[1]}}</a> at {{link[0].created}}</li>
+		{% endfor %}
+	</ul>
+</div>
 {% endblock content %}
