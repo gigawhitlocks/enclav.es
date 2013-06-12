@@ -58,7 +58,8 @@ class Application(tornado.web.Application):
         (r"/invite", InviteHandler),
         (r"/settings", SettingsHandler),
         (r"/create_enclave", NewEnclaveHandler),
-        (r"/new_post", NewPostHandler)
+        (r"/new_post", NewPostHandler),
+        (r"/\~.+", EnclaveHandler) # any URI starting with ~ will load an enclave
     ]
     #######################################################
     #Also with this comment

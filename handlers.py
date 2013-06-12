@@ -39,7 +39,7 @@ class EnclavesHandler(tornado.web.RequestHandler):
     graph.add_proxy("invited", Invited)
     graph.add_proxy("Is", Is)
     graph.add_proxy("moderates", Moderates)
-    graph.add_proxy("owns", owns)
+    graph.add_proxy("owns", Owns)
 
     graph.scripts.update("traversals.groovy")
     env = Environment(loader=FileSystemLoader('templates'),extensions=['jinja2.ext.loopcontrols'])
@@ -313,9 +313,16 @@ class NewEnclaveHandler(EnclavesHandler):
             print(self.request.arguments)
             desired_enclave = self.graph.enclaves.create(name=self.get_argument("name"),
                                                          privacy=self.get_argument("privacy"))
-
             # current user - moderates -> new enclave
             self.graph.moderates.create(self.get_current_user(),desired_enclave)
-
             # current user - owns -> new enclave
             self.graph.owns.create(self.get_current_user(),desired_enclave)
+            self.redirect("/~"+self.get_argument("name"))
+
+class EnclaveHandler(EnclavesHandler):
+    """Handles display of a single Enclave"""
+    # yes, I know, singluar/plural really isn't a great name difference
+    
+    @EnclavesHandler.require_login
+    def get(self):
+        self.write(self.request.uri[2:])
