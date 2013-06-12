@@ -58,6 +58,10 @@ class EnclavesHandler(tornado.web.RequestHandler):
         """
         return self.graph.users.get(int(self.get_secure_cookie('eid')))
 
+    def get_identities(self):
+      """Returns a generator that will provide all identities for the current user"""
+      return self.graph.gremlin.query(self.graph.scripts.get('getIdentities'), dict(_id=self.get_current_user().eid)) 
+
     def is_logged_in(self):
         """
         Checks to see if a user is logged in.
@@ -116,7 +120,11 @@ class LandingPageHandler(EnclavesHandler):
                     break
                 else:
                     i+=1
-                posts.append([post, self.get_poster(post).userid])
+                try:
+                    posts.append([post, self.get_poster(post).identity])
+                except AttributeError:
+                    posts.append([post, self.get_poster(post).userid])
+
 
             self.render_template('content.html', posts=posts)
 
@@ -250,7 +258,7 @@ class NewPostHandler(EnclavesHandler):
     
     @EnclavesHandler.require_login
     def get(self):
-        self.render_template("new_post.html")
+        self.render_template("new_post.html",identities=[i.identity for i in self.get_identities()])
     
     @EnclavesHandler.require_login
     def post(self):
@@ -258,15 +266,28 @@ class NewPostHandler(EnclavesHandler):
                                 title=self.get_argument("title"),
                                 url=self.get_argument("url"))
 
-        print(self.get_current_user())
-        self.graph.posted_by.create(newpost, self.get_current_user())   
+        valid_identities = [i.identity for i in self.get_identities()]
+
+        #protect against identity spoofing
+        if self.get_argument("identity") not in valid_identities:
+            self.forbidden()
+       
+        #retrieve actual identity object (this seems kludgy)
+        for i in self.get_identities():
+            if self.get_argument("identity") == i.identity:
+                ident_to_post_with = i
+                break
+
+        self.graph.posted_by.create(newpost, ident_to_post_with)   
         self.redirect("/")
+
+class PostHandler(EnclavesHandler):
+
+    @EnclavesHandler.require_login
+    def get(self):
+        self.write("this is an individual post page")
         
 class SettingsHandler(EnclavesHandler):
-
-    def get_identities(self):
-      """Returns a generator that will provide all identities for the current user"""
-      return self.graph.gremlin.query(self.graph.scripts.get('getIdentities'), dict(_id=self.get_current_user().eid)) 
 
     @EnclavesHandler.require_login
     def get(self):
@@ -325,4 +346,23 @@ class EnclaveHandler(EnclavesHandler):
     
     @EnclavesHandler.require_login
     def get(self):
-        self.write(self.request.uri[2:])
+
+        # this is a potential injection point, since I'm just reading from the URI directly.
+        # therefore, TODO: implement santizing of self.request.uri before passing it to Neo4j.
+        # but don't really care for now
+        current_enclave = self.graph.enclaves.lookup(name=self.request.uri[2:])
+        if current_enclave is None:
+            #TODO: implement this
+            pass # display an error message about the enclave not existing
+        else:
+            #TODO: implement this
+            pass # display current enclave
+
+class UserHandler(EnclavesHandler):
+    """Displays a single identity's profile page"""
+    
+    @EnclavesHandler.require_login
+    def get(self):
+        self.write(self.request.uri[3:])
+        #TODO: implement this
+    

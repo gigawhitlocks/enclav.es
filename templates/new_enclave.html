@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% set title = 'Home' %}
+
+
+
+{% block content %}
+<div class="sixteen columns">
+	<h3>Create a new enclave</h3>
+		<form id="new_enclave" action="/create_enclave" method="post" style="text-align: left">
+		<ul>
+			<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+			<!-- TODO: Add tooltips to explain these options -->
+			<li><label for="name">Name of Enclave (this is permanent):	</label>
+					<input type="text" id="name" name="name"></li>
+<!--					<li><label for="gov">Type of Government:</label>
+						<ul>
+							<li><input type="radio" name="gov" id="oligarchy"><label for="oligarchy">Oligarchy</label></li>
+							<li><input type="radio" name="gov" id="democracy"><label for="democracy">Democracy</label></li>
+						</ul>
+						</li>-->
+				  <li><label for="privacy">Privacy Level:</label>
+						<ul>
+							<li><input type="radio" name="privacy" value="public" id="public" checked><label for="public">Public</label></li>
+						  <li><input type="radio" name="privacy" value="readonly" id="readonly"><label for="readonly">Membership Required to Post</label></li>
+							<li><input type="radio" value="private" name="privacy" id="private"><label for="private">Private</label></li>
+						</ul>
+						<li><input type="submit" value="Create enclave!" style="margin-top:10px"></li>
+					</ul>
+		</form>
+</div>
+{% endblock content %}

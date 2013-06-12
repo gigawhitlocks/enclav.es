@@ -48,9 +48,14 @@ class Application(tornado.web.Application):
     #but for now let's just highlight them with this comment.
     #######################################################
     handlers = [
+
+        # static file routes
         (r"/css/(.*)", tornado.web.StaticFileHandler, {'path': 'static/css'}),
         (r"/images/(.*)", tornado.web.StaticFileHandler, {'path': 'static/images'}),
         (r"/js/(.*)", tornado.web.StaticFileHandler, {'path': 'static/js'}),
+        (r"/html/(.*)", tornado.web.StaticFileHandler, {'path': 'static/html'}),
+
+        # special routes
         (r"/", LandingPageHandler),
         (r"/forgot_password", ForgotPassHandler),
         (r"/sign-up", SignUpHandler), #maybe this should be sign_up? I like underscores..
@@ -59,7 +64,11 @@ class Application(tornado.web.Application):
         (r"/settings", SettingsHandler),
         (r"/create_enclave", NewEnclaveHandler),
         (r"/new_post", NewPostHandler),
-        (r"/\~.+", EnclaveHandler) # any URI starting with ~ will load an enclave
+
+        # generated routes
+        (r"/\~.+", EnclaveHandler), # any URI starting with ~ will load an enclave
+        (r"/p/.+", PostHandler), # any URI starting with /p/ will load an individual post
+        (r"/u/.+", UserHandler) # any URI such that /[user]  will load an identity's profile page
     ]
     #######################################################
     #Also with this comment
