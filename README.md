@@ -11,7 +11,7 @@ Enclav.es
 6. ```sudo ./postinstall.sh``` and wait for it to complete (this will take awhile)
 6. ```sudo -i``` to gain root.
 6. ```sh /vagrant/provision.sh``` to run my custom scripts on the VM (this will take awhile)
-6. ```exit``` to return to vagrant user and run ```python ~/cluster/cluster.py``` to start the server, forwarded to http://localhost:8080 on host OS
+6. ```exit``` to return to vagrant user and run ```python ~/enclaves/application.py``` to start the server, forwarded to http://localhost:8080 on host OS
 
 When you're done, run ```vagrant suspend``` to pause the VM, and ```vagrant resume``` to restart it.
 
