@@ -8,7 +8,8 @@ import tornado.options
 import tornado.web
 from tornado.options import define, options
 
-from bulbs.neo4jserver import Graph
+from bulbs.titan import Graph
+from bulbs.config import Config
 
 import hashlib
 from jinja2 import Environment, FileSystemLoader
@@ -25,9 +26,12 @@ import uuid
 
 
 class EnclavesHandler(tornado.web.RequestHandler):
+    # db config
+    conf = Config("http://127.0.0.1:8182/graphs/graph")
+    graph = Graph(config=conf)
+
 
     # objects
-    graph = Graph()
     graph.add_proxy("invitees", Invitee)
     graph.add_proxy("users",User)
     graph.add_proxy("identities",Identity)
@@ -136,11 +140,12 @@ class LandingPageHandler(EnclavesHandler):
         if ( not self.is_logged_in() ):
             # open database and look up input username
             self.set_header("Content-Type", "text/html")
-            user = self.graph.users.index.get_unique(userid=self.get_argument("username")) 
+            user = self.graph.users.index.lookup(userid=self.get_argument("username")) 
             if ( user == None ):
                 self.write("Username or password was incorrect.\n")
             else :
-
+                
+                user = user.next()
                 # check that password is correct
                 if check_hash(self.get_argument("password"),user.password):
                     # save the session cookie

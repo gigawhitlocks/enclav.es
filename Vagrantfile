@@ -11,21 +11,22 @@ Vagrant.configure("2") do |config|
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-#  config.vm.box_url = "http://theknown.net/CentOS-6.4-x86_64-v20130309.box"
-#	config.vm.box_url = "http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130427.box"
-	config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   #config.vm.network :forwarded_port, guest: 8000, host: 1337
 
-  config.vm.network :forwarded_port, guest: 8000, host: 8080
-  config.vm.network :forwarded_port, guest: 7474, host: 7474
+  #config.vm.network :forwarded_port, guest: 8000, host: 8080
+  #config.vm.network :forwarded_port, guest: 8182, host: 8182
+  #config.vm.network :forwarded_port, guest: 8183, host: 8183
+  #config.vm.network :forwarded_port, guest: 8184, host: 8184
+
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-#  config.vm.network :private_network, ip: "192.168.33.10"
+  config.vm.network :private_network, ip: "192.168.33.10"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on

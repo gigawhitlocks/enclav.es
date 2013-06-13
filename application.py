@@ -7,7 +7,6 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-import redis
 
 from tornado.options import define, options
 from jinja2 import Environment, FileSystemLoader
@@ -15,7 +14,8 @@ from handlers import *
 import hashlib
 from random import random
 
-from bulbs.neo4jserver import Graph
+from bulbs.titan import Graph
+from bulbs.config import Config
 from bulbs.model import Node, Relationship
 from bulbs.property import String, DateTime, Integer
 from users import User
