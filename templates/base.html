@@ -1,4 +1,3 @@
-
 <!DOCTYPE html5>
 <html>
 	<head>
@@ -7,10 +6,10 @@
 			type='text/javascript'></script>
 	
 		<!-- Stylesheets -->
-		<link rel="stylesheet" href="css/base.css">
-		<link rel="stylesheet" href="css/skeleton.css">
-		<link rel="stylesheet" href="css/layout.css">
-		<link rel="stylesheet" href="css/custom.css">
+		<link rel="stylesheet" href="/css/base.css">
+		<link rel="stylesheet" href="/css/skeleton.css">
+		<link rel="stylesheet" href="/css/layout.css">
+		<link rel="stylesheet" href="/css/custom.css">
 		
 		<style type="text/css">
 
@@ -67,7 +66,7 @@
 						<li><a href="/invite">Invite</a></li>
 						<li><a href="/settings">Settings</a></li>
 						<li style="margin-right:0"><a href="/logout">Log out</a></li><br />
-						<li><a href="/new_post">Create new post</a></li>
+            <li><a href="/new_post{% if enclave is defined %}?enclave={{ enclave }}{% endif %}">Create new post</a></li>
 						<li><a href="/create_enclave">Start an enclave</a></li>
 					</ul>
 				</div>

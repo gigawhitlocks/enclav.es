@@ -38,6 +38,7 @@
 										Post title:	<input type="text" name="title">
 										URL of link:<input type="text" name="url">
 									</div>
+									Post to enclave:<input type="text" name="enclave"{% if enclave is defined %} value="{{ enclave }}"{% endif %}>
 									Post as this identity:
 									<select name="identity">
 													{% for identity in identities %}

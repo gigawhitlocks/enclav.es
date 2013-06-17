@@ -3,11 +3,18 @@
 
 
 {% block content %}
-<div class="sixteen columns">
+<div class="ten columns">
 	<ul>
 		{% for link in posts|reverse %}
 		<li><h4><a href="{{link[0].url}}" target="_blank">{{link[0].title}}</a></h4>
 		Posted by <a href="/u/{{link[1]}}">{{link[1]}}</a> at {{link[0].created}}</li>
+		{% endfor %}
+	</ul>
+</div>
+<div class="six columns">
+	<ul><h4>Current Enclaves</h4>
+		{% for enclave in enclaves %}
+		<li><a href="/~{{enclave.name}}">{{enclave.name}}</a></li>
 		{% endfor %}
 	</ul>
 </div>

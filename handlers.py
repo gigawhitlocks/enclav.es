@@ -79,7 +79,12 @@ class EnclavesHandler(tornado.web.RequestHandler):
         Shorthand for rendering templates (pretty self-explanatory)
         **kwargs is used for passing key=value variables to the template for rendering as {{variable}} in jinja2
         """
-        self.write(self.env.get_template(template_name).render(**kwargs))
+        args = {}
+        for key in kwargs:
+            if kwargs[key]:
+                args[key] = kwargs[key]
+
+        self.write(self.env.get_template(template_name).render(**args))
 
     def get_current_user(self):
         """
@@ -150,9 +155,12 @@ class LandingPageHandler(EnclavesHandler):
                 else:
                     i+=1
                     posts.append([post, self.get_poster(post).handle])
-            
+            enclaves=[]
+            i=0
+            for enclave in self.graph.enclaves.get_all():
+               enclaves.append(enclave)
 
-            self.render_template('content.html', posts=posts)
+            self.render_template('content.html', posts=posts, enclaves=enclaves)
 
     def post(self):
         """
@@ -163,7 +171,7 @@ class LandingPageHandler(EnclavesHandler):
             # open database and look up input username
             self.set_header("Content-Type", "text/html")
             user = self.graph.users.index.lookup(userid=self.get_argument("username")) 
-            if ( user == None ):
+            if ( user is None ):
                 self.render_template("landingpage.html",error_message="Username or password was incorrect.\n")
             else :
                 
@@ -176,6 +184,7 @@ class LandingPageHandler(EnclavesHandler):
                     self.redirect("/")
                 else:
                   self.render_template("landingpage.html",error_message="Username or password was incorrect.\n")
+
 class LogoutHandler(EnclavesHandler):
     """
     Destroys existing sessions
@@ -285,7 +294,10 @@ class NewPostHandler(EnclavesHandler):
     
     @EnclavesHandler.require_login
     def get(self):
-        self.render_template("new_post.html",identities=[i.handle for i in self.get_identities()])
+        curr_enclave=self.request.uri.split("/")[1][1:] if self.request.uri[0:2] == "/~" else None
+        self.render_template("new_post.html",\
+                identities=[i.handle for i in self.get_identities()],
+                enclave=curr_enclave)
     
     @EnclavesHandler.require_login
     def post(self):
@@ -375,14 +387,17 @@ class EnclaveHandler(EnclavesHandler):
         # this is a potential injection point, since I'm just reading from the URI directly.
         # therefore, TODO: implement santizing of self.request.uri before passing it to Titan.
         # but don't really care for now
-        self.write(self.request.uri)
+
         current_enclave = self.graph.enclaves.index.lookup(name=self.request.uri[2:])
-        if current_enclave is None:
-            #TODO: implement this
-            pass # display an error message about the enclave not existing
+        if not current_enclave:
+            self.render_template("new_enclave.html",
+                    error_message="This enclave doesn't exist yet.\
+                            You can create it if you'd like.")
         else:
-            #TODO: implement this
-            pass # display current enclave
+            current_enclave = current_enclave.next()
+            self.render_template("enclave.html", enclave_name=current_enclave.name)
+            
+
 
 class UserHandler(EnclavesHandler):
     """Displays a single identity's profile page"""

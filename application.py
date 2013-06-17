@@ -61,6 +61,7 @@ class Application(tornado.web.Application):
         (r"/new_post", NewPostHandler),
 
         # generated routes
+        (r"/\~.+/new_post", NewPostHandler), # any URI starting with ~ will load an enclave
         (r"/\~.+", EnclaveHandler), # any URI starting with ~ will load an enclave
         (r"/p/.+", PostHandler), # any URI starting with /p/ will load an individual post
         (r"/u/.+", UserHandler) # any URI such that /[user]  will load an identity's profile page
