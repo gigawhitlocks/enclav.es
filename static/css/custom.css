@@ -38,3 +38,18 @@ label {
 	padding-bottom: 10px;
 }
 
+.button:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+	color: #FFFFFF;
+	background: #4e9268;
+}
+
+.button:hover,
+button:hover,
+input[type="submit"]:active,
+input[type="button"]:active {
+	color: #DDDDDD;
+	background: red;
+}

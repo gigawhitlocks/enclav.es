@@ -31,7 +31,11 @@ class EnclavesHandler(tornado.web.RequestHandler):
     #indices
 
     if len(graph.client.get_vertex_keys().content["results"]) == 0:
-    #add new indices to this list if you want them created
+        # add new indices to this list if you want them created
+        # comment them out when you need to add them
+        # if they already exist, 
+        # and uncomment any commented ones any time you reload the db
+
         for new_index in ['userid',
                 'invitee', 
                 'enclave',
@@ -53,7 +57,8 @@ class EnclavesHandler(tornado.web.RequestHandler):
     graph.add_proxy("link_posts",LinkPost)
     graph.add_proxy("enclaves", Enclave)
 
-
+    # create a 'root' dummy user to start the user tree, 
+    # so that every user (except this one) will have an Invited relationship
     if (graph.users.index.lookup(userid="root") is None):
         graph.users.create(userid="root",password=generate_storable_password("password")) 
         
@@ -159,7 +164,7 @@ class LandingPageHandler(EnclavesHandler):
             self.set_header("Content-Type", "text/html")
             user = self.graph.users.index.lookup(userid=self.get_argument("username")) 
             if ( user == None ):
-                self.write("Username or password was incorrect.\n")
+                self.render_template("landingpage.html",error_message="Username or password was incorrect.\n")
             else :
                 
                 user = user.next()
@@ -170,7 +175,7 @@ class LandingPageHandler(EnclavesHandler):
                     self.set_secure_cookie("eid", str(user.eid))
                     self.redirect("/")
                 else:
-                    self.write("Username or password was incorrect.\n")
+                  self.render_template("landingpage.html",error_message="Username or password was incorrect.\n")
 class LogoutHandler(EnclavesHandler):
     """
     Destroys existing sessions
