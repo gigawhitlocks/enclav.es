@@ -30,22 +30,12 @@ class EnclavesHandler(tornado.web.RequestHandler):
     conf = Config("http://127.0.0.1:8182/graphs/graph")
     graph = Graph(config=conf)
 
-    # objects
-    graph.client.create_vertex_key_index("invitee")
-    graph.add_proxy("invitees", Invitee)
 
-    graph.client.create_vertex_key_index("userid")
+    # objects
+    graph.add_proxy("invitees", Invitee)
     graph.add_proxy("users",User)
-    
-    graph.client.create_vertex_key_index("identity")
     graph.add_proxy("identities",Identity)
-    
-    graph.client.create_vertex_key_index("title")
-    graph.add_proxy("posts",Post)
-    
     graph.add_proxy("link_posts",LinkPost)
-    
-    graph.client.create_vertex_key_index("name")
     graph.add_proxy("enclaves", Enclave)
 
     #relationships
@@ -378,9 +368,6 @@ class UserHandler(EnclavesHandler):
     
     @EnclavesHandler.require_login
     def get(self):
-
-        #TODO: input sanitizing
         self.write(self.request.uri[3:])
-
         #TODO: implement this
-         
+    
