@@ -30,19 +30,19 @@ class EnclavesHandler(tornado.web.RequestHandler):
 
     #indices
 
-   # current_indices = graph.client.get_vertex_keys().content["results"]
+    if len(graph.client.get_vertex_keys().content["results"]) == 0:
     #add new indices to this list if you want them created
-    for new_index in ['userid',
-            'invitee', 
-            'enclave',
-            'title',
-            'handle',
-            'email',
-            'token',
-            'created',
-            'element_type']:
+        for new_index in ['userid',
+                'invitee', 
+                'enclave',
+                'title',
+                'handle',
+                'email',
+                'token',
+                'created',
+                'element_type']:
 
-        graph.client.create_vertex_key_index(new_index)
+            graph.client.create_vertex_key_index(new_index)
 
 
     # objects
@@ -137,16 +137,13 @@ class LandingPageHandler(EnclavesHandler):
 
         else:
             posts=[]
-#            i=0
-#            for post in self.graph.link_posts.get_all():
-#                if i > 20:
-#                    break
-#                else:
-#                    i+=1
-#                try:
-#                    posts.append([post, self.get_poster(post).identity])
-#                except AttributeError:
-#                    posts.append([post, self.get_poster(post).userid])
+            i=0
+            for post in self.graph.link_posts.get_all():
+                if i > 20:
+                    break
+                else:
+                    i+=1
+                    posts.append([post, self.get_poster(post).handle])
             
 
             self.render_template('content.html', posts=posts)
