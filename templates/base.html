@@ -66,7 +66,7 @@
 						<li><a href="/invite">Invite</a></li>
 						<li><a href="/settings">Settings</a></li>
 						<li style="margin-right:0"><a href="/logout">Log out</a></li><br />
-            <li><a href="/new_post{% if enclave is defined %}?enclave={{ enclave }}{% endif %}">Create new post</a></li>
+            <li><a href="/{% if enclave is defined %}~{{ enclave }}/{% endif %}new_post">Create new post</a></li>
 						<li><a href="/create_enclave">Start an enclave</a></li>
 					</ul>
 				</div>
