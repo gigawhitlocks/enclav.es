@@ -1,5 +1,5 @@
 from bulbs.model import Node, Relationship
-from bulbs.property import String, Integer, DateTime
+from bulbs.property import String,DateTime
 from bulbs.utils import current_datetime
 
 # pretty self-explanatory
@@ -14,7 +14,7 @@ class User(Node):
 # User --Is--> Identity
 class Identity(Node):
     element_type = "identity"
-    identity = String(nullable=False)
+    handle = String(nullable=False)
 
 # Identity --subscribes_to--> Enclave OR
 # Identity --is_member_of--> Enclave when there is a distinction

@@ -1,4 +1,3 @@
-  
 import tornado.auth
 import tornado.autoreload
 import tornado.escape
@@ -6,17 +5,15 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-from tornado.options import define, options
 
 from bulbs.titan import Graph
 from bulbs.config import Config
 
-import hashlib
 from jinja2 import Environment, FileSystemLoader
 
-from users import *
-from posts import *
-from enclaves import *
+from users import Invitee, User, Invited, Identity, Is
+from posts import LinkPost, PostedBy
+from enclaves import Enclave, Moderates, Owns
 
 from hashing_passwords import make_hash as generate_storable_password, check_hash
 import smtplib
@@ -31,12 +28,34 @@ class EnclavesHandler(tornado.web.RequestHandler):
     graph = Graph(config=conf)
 
 
+    #indices
+
+   # current_indices = graph.client.get_vertex_keys().content["results"]
+    #add new indices to this list if you want them created
+    for new_index in ['userid',
+            'invitee', 
+            'enclave',
+            'title',
+            'handle',
+            'email',
+            'token',
+            'created',
+            'element_type']:
+
+        graph.client.create_vertex_key_index(new_index)
+
+
     # objects
     graph.add_proxy("invitees", Invitee)
     graph.add_proxy("users",User)
     graph.add_proxy("identities",Identity)
     graph.add_proxy("link_posts",LinkPost)
     graph.add_proxy("enclaves", Enclave)
+
+
+    if (graph.users.index.lookup(userid="root") is None):
+        graph.users.create(userid="root",password=generate_storable_password("password")) 
+        
 
     #relationships
     graph.add_proxy("posted_by", PostedBy)
@@ -64,7 +83,7 @@ class EnclavesHandler(tornado.web.RequestHandler):
 
     def get_identities(self):
       """Returns a generator that will provide all identities for the current user"""
-      return self.graph.gremlin.query(self.graph.scripts.get('getIdentities'), dict(_id=self.get_current_user().eid)) 
+      return self.get_current_user().outV("is")
 
     def is_logged_in(self):
         """
@@ -118,17 +137,17 @@ class LandingPageHandler(EnclavesHandler):
 
         else:
             posts=[]
-            i=0
-            for post in self.graph.link_posts.get_all():
-                if i > 20:
-                    break
-                else:
-                    i+=1
-                try:
-                    posts.append([post, self.get_poster(post).identity])
-                except AttributeError:
-                    posts.append([post, self.get_poster(post).userid])
-
+#            i=0
+#            for post in self.graph.link_posts.get_all():
+#                if i > 20:
+#                    break
+#                else:
+#                    i+=1
+#                try:
+#                    posts.append([post, self.get_poster(post).identity])
+#                except AttributeError:
+#                    posts.append([post, self.get_poster(post).userid])
+            
 
             self.render_template('content.html', posts=posts)
 
@@ -233,7 +252,7 @@ class SignUpHandler(EnclavesHandler):
         if (invitee is None):
             self.forbidden()
         else:
-            newuser = self.graph.identities.index.lookup(identity=self.get_argument("userid"))
+            newuser = self.graph.identities.index.lookup(handle=self.get_argument("userid"))
             if newuser is not None:
                 self.write("Handle is taken")
             else:
@@ -242,13 +261,13 @@ class SignUpHandler(EnclavesHandler):
                         password=generate_storable_password(self.get_argument("password")))
                 
 
-                
+                print(newuser.userid) 
                 get_inviter = self.graph.scripts.get('getInviter')
                 inviter = self.graph.gremlin.query(get_inviter, dict(_id=invitee.next().eid)).next()
                 self.graph.invited.create(inviter,newuser)
 
                 # creates an Identity with the same name as the initial username
-                self.graph.Is.create(newuser,self.graph.identities.create(identity=newuser.userid))
+                self.graph.Is.create(newuser,self.graph.identities.create(handle=newuser.userid))
                 
                 self.clear_cookie("token")
                 self.clear_cookie("userid")
@@ -263,7 +282,7 @@ class NewPostHandler(EnclavesHandler):
     
     @EnclavesHandler.require_login
     def get(self):
-        self.render_template("new_post.html",identities=[i.identity for i in self.get_identities()])
+        self.render_template("new_post.html",identities=[i.handle for i in self.get_identities()])
     
     @EnclavesHandler.require_login
     def post(self):
@@ -271,7 +290,7 @@ class NewPostHandler(EnclavesHandler):
                                 title=self.get_argument("title"),
                                 url=self.get_argument("url"))
 
-        valid_identities = [i.identity for i in self.get_identities()]
+        valid_identities = [i.handle for i in self.get_identities()]
 
         #protect against identity spoofing
         if self.get_argument("identity") not in valid_identities:
@@ -279,7 +298,7 @@ class NewPostHandler(EnclavesHandler):
        
         #retrieve actual identity object (this seems kludgy)
         for i in self.get_identities():
-            if self.get_argument("identity") == i.identity:
+            if self.get_argument("identity") == i.handle:
                 ident_to_post_with = i
                 break
 
@@ -303,12 +322,12 @@ class SettingsHandler(EnclavesHandler):
         # Creates new Identities
         desired_identity = self.get_argument("new_identity")
         if desired_identity is not None:
-            new_identity = self.graph.identities.index.lookup(identity=desired_identity)  
+            new_identity = self.graph.identities.index.lookup(handle=desired_identity)  
             if new_identity is not None: #identity is taken
               self.write("Identity is taken.")
               self.redirect("/settings")
             else: #identity is available
-                new_identity = self.graph.identities.create(identity=desired_identity)
+                new_identity = self.graph.identities.create(handle=desired_identity)
                 self.graph.Is.create(self.get_current_user(),new_identity)
                 self.redirect("/settings")
 
@@ -329,7 +348,6 @@ class NewEnclaveHandler(EnclavesHandler):
     @EnclavesHandler.require_login
     def post(self):
         desired_enclave = self.graph.enclaves.index.lookup(name=self.get_argument("name"))
-        request = self.request
         print(self.get_argument('privacy'))
 
         if desired_enclave is not None:
