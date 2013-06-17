@@ -46,6 +46,16 @@
 		{% block header %}{% endblock header %}
 	</head>
 	<body>
+    {% if error_message is defined %}
+      <div class="error">
+        <div class="container">
+          <div class="sixteen columns">
+            <!-- blahhhh that's a lot of stupid boilerplate divs, eh? -->
+            <strong>!! ERROR !! {{ error_message }}</strong>
+          </div>
+        </div>
+      </div>
+    {% endif %}
 		<div class="header">
 		<div class="container" style="margin-top:10px">
 				{% block pageheader %}

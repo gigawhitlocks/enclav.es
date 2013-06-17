@@ -29,3 +29,12 @@ a:active { color: #DDDDDD; background-color: red} /* active links */
 label {
 	display: inline;
 }
+
+
+.error {
+	background-color: #FA8072;
+	margin: 0;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+

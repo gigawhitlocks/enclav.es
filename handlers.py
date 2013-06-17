@@ -36,6 +36,7 @@ class EnclavesHandler(tornado.web.RequestHandler):
                 'invitee', 
                 'enclave',
                 'title',
+#                'name',
                 'handle',
                 'email',
                 'token',
@@ -251,7 +252,7 @@ class SignUpHandler(EnclavesHandler):
         else:
             newuser = self.graph.identities.index.lookup(handle=self.get_argument("userid"))
             if newuser is not None:
-                self.write("Handle is taken")
+                self.render_template("sign-up.html", error_message="That handle is taken.")
             else:
                 newuser = self.graph.users.create(
                         userid=self.get_argument("userid"),
@@ -321,8 +322,7 @@ class SettingsHandler(EnclavesHandler):
         if desired_identity is not None:
             new_identity = self.graph.identities.index.lookup(handle=desired_identity)  
             if new_identity is not None: #identity is taken
-              self.write("Identity is taken.")
-              self.redirect("/settings")
+              self.render_template("settings.html", identities=self.get_identities(),error_message="This identity is taken.")
             else: #identity is available
                 new_identity = self.graph.identities.create(handle=desired_identity)
                 self.graph.Is.create(self.get_current_user(),new_identity)
@@ -368,9 +368,10 @@ class EnclaveHandler(EnclavesHandler):
     def get(self):
 
         # this is a potential injection point, since I'm just reading from the URI directly.
-        # therefore, TODO: implement santizing of self.request.uri before passing it to Neo4j.
+        # therefore, TODO: implement santizing of self.request.uri before passing it to Titan.
         # but don't really care for now
-        current_enclave = self.graph.enclaves.lookup(name=self.request.uri[2:])
+        self.write(self.request.uri)
+        current_enclave = self.graph.enclaves.index.lookup(name=self.request.uri[2:])
         if current_enclave is None:
             #TODO: implement this
             pass # display an error message about the enclave not existing
