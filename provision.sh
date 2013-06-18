@@ -2,7 +2,7 @@
 
 
 # install java
-apt-get install python-software-properties make python-dev -y -q;
+apt-get install python-software-properties make python-dev protobuf-compiler -y -q;
 add-apt-repository ppa:webupd8team/java;
 apt-get update -y -q;
 apt-get install oracle-java6-installer -y;
@@ -43,18 +43,8 @@ cd /home/vagrant/;
 wget http://tinkerpop.com/downloads/gremlin/gremlin-groovy-2.3.0.zip;
 unzip gremlin-groovy-2.3.0.zip;
 
-# Download redis
+# Download riak
 
-#echo "Installing redis..";
-#wget https://dl.dropboxusercontent.com/u/14943993/redis-2.6.9.tar.gz;
-#tar xf redis-[0-9]*;
-#cd redis-[0-9]*;
-#make;
-#make install;
-#sysctl vm.overcommit_memory=1;
-#echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf
-
-# set redis to run in background & then run redis
-#sed -i.bak 's/daemonize no/daemonize yes/g' /home/vagrant/redis-[0-9]*/redis.conf
-#/usr/local/bin/redis-server /home/vagrant/redis-[0-9]*/redis.conf &
-
+wget http://s3.amazonaws.com/downloads.basho.com/riak/1.3/1.3.1/ubuntu/precise/riak_1.3.1-1_amd64.deb
+dpkg -i riak_1.3.1-1_amd64.deb
+cp -f /vagrant/app.config /etc/riak/app.config
