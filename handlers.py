@@ -24,6 +24,7 @@ import riak
 import uuid
 import time
 
+from xml.sax.saxutils import quoteattr
 
 class EnclavesHandler(tornado.web.RequestHandler):
     # db config
@@ -62,17 +63,13 @@ class EnclavesHandler(tornado.web.RequestHandler):
     graph.add_proxy("identities",Identity)
     graph.add_proxy("posts",Post)
     graph.add_proxy("enclaves", Enclave)
-
-
-
-
-    
   
     #relationships
     graph.add_proxy("posted_by", PostedBy)
     graph.add_proxy("invited", Invited)
     graph.add_proxy("Is", Is)
     graph.add_proxy("moderates", Moderates)
+    graph.add_proxy("owns", Owns)
 
     # TODO: put first-run setup in its own file that isn't called
     # sofa king much   graph.add_proxy("owns", Owns)
@@ -359,13 +356,13 @@ class NewPostHandler(EnclavesHandler):
     
     def create_post_dict(self):
         data = {}
-        data['title'] = self.get_argument("title")
+        data['title'] = quoteattr(self.get_argument("title"))
         post_type = self.get_argument("post_type")
 
         if post_type == "text":
-            data['body_text'] = self.get_argument("body")
+            data['body_text'] = quoteattr(self.get_argument("body"))
         elif post_type == "image" or post_type == "link" :
-            data['url'] = self.get_argument("url")
+            data['url'] = quoteattr(self.get_argument("url"))
         else:
             raise Exception("bad post type")
 
