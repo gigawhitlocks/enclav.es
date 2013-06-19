@@ -14,6 +14,8 @@ from handlers import EnclaveHandler, PostHandler,\
         SettingsHandler, NewPostHandler, NewEnclaveHandler,\
         SignUpHandler, InviteHandler, LogoutHandler
 
+import time
+
 """
 
 This file contains a few things:
@@ -31,48 +33,48 @@ define("port", default=8000, help="run on the given port", type=int)
 
 
 class Application(tornado.web.Application):
-  def __init__(self):
-    settings = {
-      'cookie_secret': "GOTTA HAVE MY COOKIE SECRETE", #todo: read in from elsewhere
-      "xsrf_cookies": False
-    }
+    def __init__(self):
+        settings = {
+          'cookie_secret': "GOTTA HAVE MY COOKIE SECRETE", #todo: read in from elsewhere
+          "xsrf_cookies": False
+        }
 
-    #######################################################
-    #THIS IS WHERE ROUTES ARE DEFINED.
-    #May want to move these elsewhere at some point,
-    #but for now let's just highlight them with this comment.
-    #######################################################
-    handlers = [
+        #######################################################
+        #THIS IS WHERE ROUTES ARE DEFINED.
+        #May want to move these elsewhere at some point,
+        #but for now let's just highlight them with this comment.
+        #######################################################
+        handlers = [
 
-        # static file routes
-        (r"/css/(.*)", tornado.web.StaticFileHandler, {'path': 'static/css'}),
-        (r"/images/(.*)", tornado.web.StaticFileHandler, {'path': 'static/images'}),
-        (r"/js/(.*)", tornado.web.StaticFileHandler, {'path': 'static/js'}),
-        (r"/html/(.*)", tornado.web.StaticFileHandler, {'path': 'static/html'}),
+            # static file routes
+            (r"/css/(.*)", tornado.web.StaticFileHandler, {'path': 'static/css'}),
+            (r"/images/(.*)", tornado.web.StaticFileHandler, {'path': 'static/images'}),
+            (r"/js/(.*)", tornado.web.StaticFileHandler, {'path': 'static/js'}),
+            (r"/html/(.*)", tornado.web.StaticFileHandler, {'path': 'static/html'}),
 
-        # special routes
-        (r"/", LandingPageHandler),
-        (r"/forgot_password", ForgotPassHandler),
-        (r"/sign-up", SignUpHandler), #maybe this should be sign_up? I like underscores..
-        (r"/logout", LogoutHandler),
-        (r"/invite", InviteHandler),
-        (r"/settings", SettingsHandler),
-        (r"/create_enclave", NewEnclaveHandler),
-        (r"/new_post", NewPostHandler),
+            # special routes
+            (r"/", LandingPageHandler),
+            (r"/forgot_password", ForgotPassHandler),
+            (r"/sign-up", SignUpHandler), #maybe this should be sign_up? I like underscores..
+            (r"/logout", LogoutHandler),
+            (r"/invite", InviteHandler),
+            (r"/settings", SettingsHandler),
+            (r"/create_enclave", NewEnclaveHandler),
+            (r"/new_post", NewPostHandler),
 
-        # generated routes
-        (r"/\~.+/new_post", NewPostHandler), # any URI starting with ~ will load an enclave
-        (r"/\~.+", EnclaveHandler), # any URI starting with ~ will load an enclave
-        (r"/p/.+", PostHandler), # any URI starting with /p/ will load an individual post
-        (r"/u/.+", UserHandler) # any URI such that /[user]  will load an identity's profile page
-    ]
-    #######################################################
-    #Also with this comment
-    #######################################################
-    
+            # generated routes
+            (r"/\~.+/new_post", NewPostHandler), # any URI starting with ~ will load an enclave
+            (r"/\~.+", EnclaveHandler), # any URI starting with ~ will load an enclave
+            (r"/p/.+", PostHandler), # any URI starting with /p/ will load an individual post
+            (r"/u/.+", UserHandler) # any URI such that /[user]  will load an identity's profile page
+        ]
+        #######################################################
+        #Also with this comment
+        #######################################################
 
 
-    tornado.web.Application.__init__(self, handlers,**settings)
+
+        tornado.web.Application.__init__(self, handlers,**settings)
 
 def main():
   tornado.options.parse_command_line()

@@ -24,24 +24,8 @@ apt-get install sendmail git zip python-pip screen make bpython expect -y -q;
 #############
 pip install -r /home/vagrant/enclav.es/requirements.txt
 
-
-echo "Downloading Neo4j..";
-cd /opt;
-wget https://dl.dropboxusercontent.com/u/14943993/neo4j-community-1.8.1-unix.tar.gz;
-
-echo "Installing Neo4j..";
-tar xf neo4j-community-1.8.1-unix.tar.gz;
-useradd neo4j;
-
-ulimit -n 40000;
-echo "Starting neo4j...";
-chown -R neo4j.neo4j /opt/neo4j-community-1.8.1;
-/opt/neo4j-community-1.8.1/bin/neo4j start;
-cd /home/vagrant/;
-
-
-wget http://tinkerpop.com/downloads/gremlin/gremlin-groovy-2.3.0.zip;
-unzip gremlin-groovy-2.3.0.zip;
+wget http://s3.thinkaurelius.com/downloads/titan/titan-all-0.3.1.zip
+unzip titan-all-0.3.1.zip
 
 # Download riak
 

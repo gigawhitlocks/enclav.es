@@ -12,20 +12,26 @@ from bulbs.config import Config
 from jinja2 import Environment, FileSystemLoader
 
 from users import Invitee, User, Invited, Identity, Is
-from posts import LinkPost, PostedBy
+from posts import Post, PostedBy
 from enclaves import Enclave, Moderates, Owns
 
-from hashing_passwords import make_hash as generate_storable_password, check_hash
+from hashing_passwords import make_hash as generate_storable_password,\
+        check_hash
 import smtplib
 from email.parser import Parser
 
+import riak
 import uuid
+import time
 
 
 class EnclavesHandler(tornado.web.RequestHandler):
     # db config
     conf = Config("http://127.0.0.1:8182/graphs/graph")
     graph = Graph(config=conf)
+    riak_client = riak.RiakClient(port=8087, \
+            transport_class=riak.RiakPbcTransport)
+
 
 
     #indices
@@ -40,7 +46,7 @@ class EnclavesHandler(tornado.web.RequestHandler):
                 'invitee', 
                 'enclave',
                 'title',
-#                'name',
+                'name',
                 'handle',
                 'email',
                 'token',
@@ -54,30 +60,45 @@ class EnclavesHandler(tornado.web.RequestHandler):
     graph.add_proxy("invitees", Invitee)
     graph.add_proxy("users",User)
     graph.add_proxy("identities",Identity)
-    graph.add_proxy("link_posts",LinkPost)
+    graph.add_proxy("posts",Post)
     graph.add_proxy("enclaves", Enclave)
 
-    # create a 'root' dummy user to start the user tree, 
-    # so that every user (except this one) will have an Invited relationship
-    if (graph.users.index.lookup(userid="root") is None):
-        graph.users.create(userid="root",password=generate_storable_password("password")) 
-        
 
+
+
+    
+  
     #relationships
     graph.add_proxy("posted_by", PostedBy)
     graph.add_proxy("invited", Invited)
     graph.add_proxy("Is", Is)
     graph.add_proxy("moderates", Moderates)
-    graph.add_proxy("owns", Owns)
+
+    # TODO: put first-run setup in its own file that isn't called
+    # sofa king much   graph.add_proxy("owns", Owns)
+
+    # create a 'root' dummy user to start the user tree, 
+    # so that every user (except this one) will have an Invited relationship
+    if (graph.users.index.lookup(userid="root") is None):
+        graph.users.create(userid="root",\
+                password=generate_storable_password("password"))  
+
+        # create special "all" enclave if it doesn't exist.
+        if (graph.enclaves.index.lookup(name="all") is None):
+            All = graph.enclaves.create(name="all")
+            graph.owns.create(graph.users.index.lookup("root"),All)
+                
 
     graph.scripts.update("traversals.groovy")
-    env = Environment(loader=FileSystemLoader('templates'),extensions=['jinja2.ext.loopcontrols'])
+    env = Environment(loader=FileSystemLoader('templates'),\
+            extensions=['jinja2.ext.loopcontrols'])
 
 
     def render_template(self, template_name, **kwargs):
         """
         Shorthand for rendering templates (pretty self-explanatory)
-        **kwargs is used for passing key=value variables to the template for rendering as {{variable}} in jinja2
+        **kwargs is used for passing key=value variables to the template for 
+        rendering as {{variable}} in jinja2
         """
         args = {}
         for key in kwargs:
@@ -93,7 +114,8 @@ class EnclavesHandler(tornado.web.RequestHandler):
         return self.graph.users.get(int(self.get_secure_cookie('eid')))
 
     def get_identities(self):
-      """Returns a generator that will provide all identities for the current user"""
+      """Returns a generator that will provide 
+      all identities for the current user"""
       return self.get_current_user().outV("is")
 
     def is_logged_in(self):
@@ -109,13 +131,16 @@ class EnclavesHandler(tornado.web.RequestHandler):
         """
         self.clear()
         self.set_status(403)
-        self.finish("<html><body><h3>403 That is not permitted</h3></body></html>")
+        self.finish("<html><body><h3>403 That is not \
+                permitted</h3></body></html>")
 
     def get_poster(self, post):
         """ returns the poster of post """
         # .next() is safe here because any post will only have one poster
-        return self.graph.gremlin.query(self.graph.scripts.get('getNeighboringVertices'),
-                dict(_id=post.eid,relationship="posted_by",direction="out")).next()
+        return self.graph.gremlin.query(\
+                self.graph.scripts.get('getNeighboringVertices'),
+                dict(_id=post.eid,relationship="posted_by",\
+                        direction="out")).next()
 
     @staticmethod
     def require_login(function, *args, **kwargs):
@@ -128,14 +153,23 @@ class EnclavesHandler(tornado.web.RequestHandler):
             function(self, *args, **kwargs)
         return new_function
 
+    @staticmethod
+    def int_time(hours_ago=0, minutes_ago=0, hours_ahead=0, minutes_ahead=0):
+        """Returns time as an int for use as a timestamp in riak
+            Use any combo of keyword args for easy offsets. Returns time as
+            millionths of seconds since Unix epoch"""
+        return int((time.time()+60*(minutes_ahead-minutes_ago)\
+                +3600*(hours_ahead-hours_ago))*10**6) 
+
 
 class LandingPageHandler(EnclavesHandler):
     """
     LandingPageHandler handles all requests sent to the root of the domain.
-    This means displaying a login page when no user is logged in and the home page
-    for logged in users.
+    This means displaying a login page when no user is logged in and the home 
+    page for logged in users.
 
-    It also handles POST requests sent to the root, which is where logins are handled.
+    It also handles POST requests sent to the root,
+    which is where logins are handled.
     """
 
     def get(self):
@@ -147,20 +181,20 @@ class LandingPageHandler(EnclavesHandler):
             self.render_template("landingpage.html")
 
         else:
-            posts=[]
-            i=0
-            for post in self.graph.link_posts.get_all():
-                if i > 20:
-                    break
-                else:
-                    i+=1
-                    posts.append([post, self.get_poster(post).handle])
+#            posts=[]
+#            i=0
+#            for post in self.graph.posts.get_all():
+#                if i > 20:
+#                    break
+#                else:
+#                    i+=1
+#                    posts.append([post, self.get_poster(post).handle])
             enclaves=[]
-            i=0
+#            i=0
             for enclave in self.graph.enclaves.get_all():
                enclaves.append(enclave)
 
-            self.render_template('content.html', posts=posts, enclaves=enclaves)
+            self.render_template('content.html', enclaves=enclaves)
 
     def post(self):
         """
@@ -170,9 +204,11 @@ class LandingPageHandler(EnclavesHandler):
         if ( not self.is_logged_in() ):
             # open database and look up input username
             self.set_header("Content-Type", "text/html")
-            user = self.graph.users.index.lookup(userid=self.get_argument("username")) 
+            user = self.graph.users.index.lookup(\
+                    userid=self.get_argument("username")) 
             if ( user is None ):
-                self.render_template("landingpage.html",error_message="Username or password was incorrect.\n")
+                self.render_template("landingpage.html",\
+                        error_message="Username or password was incorrect.\n")
             else :
                 
                 user = user.next()
@@ -183,7 +219,8 @@ class LandingPageHandler(EnclavesHandler):
                     self.set_secure_cookie("eid", str(user.eid))
                     self.redirect("/")
                 else:
-                  self.render_template("landingpage.html",error_message="Username or password was incorrect.\n")
+                  self.render_template("landingpage.html",\
+                          error_message="Username or password was incorrect.\n")
 
 class LogoutHandler(EnclavesHandler):
     """
@@ -202,7 +239,8 @@ class InviteHandler(EnclavesHandler):
     @EnclavesHandler.require_login  
     def get(self):
         """
-        This loads the invitation creation dialog, for existing users to send invitations
+        This loads the invitation creation dialog, 
+        for existing users to send invitations
         """
         self.render_template("invite.html")
 
@@ -213,8 +251,11 @@ class InviteHandler(EnclavesHandler):
         This actually sends out the email when the existing user clicks 'send'
         """
 
-        currentinvitee = self.graph.invitees.index.lookup(email=self.get_argument("email")) 
-        # check to see if this email has already been invited. If it has, remove all of its previos occurrences
+        currentinvitee = self.graph.invitees.index.lookup(\
+                email=self.get_argument("email"))
+
+        # check to see if this email has already been invited. 
+        # If it has, remove all of its previos occurrences
         if ( currentinvitee is not None ):
             for current in currentinvitee:
                 self.graph.invitees.delete(current.eid)
@@ -223,9 +264,12 @@ class InviteHandler(EnclavesHandler):
         #creates an Invitee object with the given email and a generated uuid
         currentinvitee = self.graph.invitees.create(
                                             email=self.get_argument("email"), 
-                                            token=uuid.uuid4().hex) #TODO: Does this need to be more secure?
+                                            token=uuid.uuid4().hex)
+                                        #TODO: Does this need to be more secure?
 
-        currentuser = self.graph.users.index.lookup(userid=self.get_secure_cookie("userid")).next()
+        currentuser = self.graph.users.index.lookup(\
+                userid=self.get_secure_cookie("userid")).next()
+
         self.graph.invited.create(currentuser, currentinvitee)
 
         ## build the email and send it. SMTP host is localhost for now.
@@ -235,19 +279,22 @@ class InviteHandler(EnclavesHandler):
         'Subject: You have been invited to enclav.es\n'
         '\n'
         ## TODO: Write out a better invite email
-        'Click here to accept the invitation: http://localhost:8080/sign-up?token='+currentinvitee.token+'\n')
+        'Click here to accept the invitation: http://enclav.es/sign-up?token='\
+                +currentinvitee.token+'\n')
 
         s.sendmail(headers['from'],[headers['to']],headers.as_string())
         self.redirect("/invite")
 
 class SignUpHandler(EnclavesHandler):
     """
-    This route handles incoming new users sent from their email to sign-up/?token=[generated token]
+    This route handles incoming new users sent from 
+    their email to sign-up/?token=[generated token]
     """
 
     def get(self):
         """This checks to make sure the provided token is valid"""
-        currentinvitee = self.graph.invitees.index.lookup(token=self.get_argument("token"))
+        currentinvitee = self.graph.invitees.index.lookup(\
+                token=self.get_argument("token"))
         if ( currentinvitee is None ) :
             self.redirect("/")
         else:
@@ -258,28 +305,36 @@ class SignUpHandler(EnclavesHandler):
 
 
     def post(self):
-        """This processes the new user form and creates the new user if the username isn't taken already"""
+        """This processes the new user form and creates 
+        the new user if the username isn't taken already"""
         
-        invitee = self.graph.invitees.index.lookup(token=self.get_secure_cookie("token"))
+        invitee = self.graph.invitees.index.lookup(\
+                token=self.get_secure_cookie("token"))
+
         if (invitee is None):
             self.forbidden()
         else:
-            newuser = self.graph.identities.index.lookup(handle=self.get_argument("userid"))
+            newuser = self.graph.identities.index.lookup(\
+                    handle=self.get_argument("userid"))
+
             if newuser is not None:
-                self.render_template("sign-up.html", error_message="That handle is taken.")
+                self.render_template(\
+                        "sign-up.html", error_message="That handle is taken.")
             else:
                 newuser = self.graph.users.create(
                         userid=self.get_argument("userid"),
-                        password=generate_storable_password(self.get_argument("password")))
+                        password=generate_storable_password(\
+                                self.get_argument("password")))
                 
 
-                print(newuser.userid) 
                 get_inviter = self.graph.scripts.get('getInviter')
-                inviter = self.graph.gremlin.query(get_inviter, dict(_id=invitee.next().eid)).next()
+                inviter = self.graph.gremlin.query(\
+                        get_inviter, dict(_id=invitee.next().eid)).next()
                 self.graph.invited.create(inviter,newuser)
 
                 # creates an Identity with the same name as the initial username
-                self.graph.Is.create(newuser,self.graph.identities.create(handle=newuser.userid))
+                self.graph.Is.create(newuser,\
+                        self.graph.identities.create(handle=newuser.userid))
                 
                 self.clear_cookie("token")
                 self.clear_cookie("userid")
@@ -294,16 +349,31 @@ class NewPostHandler(EnclavesHandler):
     
     @EnclavesHandler.require_login
     def get(self):
-        curr_enclave=self.request.uri.split("/")[1][1:] if self.request.uri[0:2] == "/~" else None
+
+        curr_enclave=self.request.uri.split("/")[1][1:] \
+                if self.request.uri[0:2] == "/~" else None
+
         self.render_template("new_post.html",\
                 identities=[i.handle for i in self.get_identities()],
                 enclave=curr_enclave)
     
+    def create_post_dict(self):
+        data = {}
+        data['title'] = self.get_argument("title")
+        post_type = self.get_argument("post_type")
+
+        if post_type == "text":
+            data['body_text'] = self.get_argument("body")
+        elif post_type == "image" or post_type == "link" :
+            data['url'] = self.get_argument("url")
+        else:
+            raise Exception("bad post type")
+
+        return data
+
     @EnclavesHandler.require_login
     def post(self):
-        newpost = self.graph.link_posts.create(
-                                title=self.get_argument("title"),
-                                url=self.get_argument("url"))
+
 
         valid_identities = [i.handle for i in self.get_identities()]
 
@@ -316,8 +386,33 @@ class NewPostHandler(EnclavesHandler):
             if self.get_argument("identity") == i.handle:
                 ident_to_post_with = i
                 break
+        
+        post_to = self.get_argument("enclave")
+        post_type = self.get_argument("post_type")
+        bucket_name = post_to + ":" + post_type if post_to != "" \
+                else "all:" + post_type
 
-        self.graph.posted_by.create(newpost, ident_to_post_with)   
+        # creates post and stores it in riak.
+        # stored in bucket where bucket name == enclave_name/post_type. whoo.
+        # if not posting to an enclave, posts to bucket/meta-enclave 'all'
+
+        bucket = self.riak_client.bucket(bucket_name)
+        curr_time = EnclavesHandler.int_time()
+        key = str(curr_time)+":"+str(ident_to_post_with.eid)
+        riakpost = bucket.new(key,
+                data = self.create_post_dict())
+        riakpost.add_index('time_int', curr_time)
+        riakpost.add_index('uid_int', ident_to_post_with.eid)
+        riakpost.add_index('uid_bin', ident_to_post_with.handle)
+        riakpost.store()
+        print(bucket_name)
+        print(key)
+
+        # adds the Post to the graph. Note that 
+        # ALL THAT THIS DOES is link to riak for actual data
+        newpost = self.graph.posts.create(riak_key=key, riak_bucket=bucket_name)
+        self.graph.posted_by.create(newpost,ident_to_post_with)   
+
         self.redirect("/")
 
 class PostHandler(EnclavesHandler):
@@ -336,12 +431,20 @@ class SettingsHandler(EnclavesHandler):
     def post(self):
         # Creates new Identities
         desired_identity = self.get_argument("new_identity")
+
         if desired_identity is not None:
-            new_identity = self.graph.identities.index.lookup(handle=desired_identity)  
+            new_identity = self.graph.identities.index.lookup(\
+                    handle=desired_identity)  
+
             if new_identity is not None: #identity is taken
-              self.render_template("settings.html", identities=self.get_identities(),error_message="This identity is taken.")
+              self.render_template("settings.html",\
+                      identities=self.get_identities(),\
+                      error_message="This identity is taken.")
+
             else: #identity is available
-                new_identity = self.graph.identities.create(handle=desired_identity)
+                new_identity = self.graph.identities.create(\
+                        handle=desired_identity)
+
                 self.graph.Is.create(self.get_current_user(),new_identity)
                 self.redirect("/settings")
 
@@ -361,7 +464,9 @@ class NewEnclaveHandler(EnclavesHandler):
 
     @EnclavesHandler.require_login
     def post(self):
-        desired_enclave = self.graph.enclaves.index.lookup(name=self.get_argument("name"))
+        desired_enclave = self.graph.enclaves.index.lookup(\
+                name=self.get_argument("name"))
+
         print(self.get_argument('privacy'))
 
         if desired_enclave is not None:
@@ -369,12 +474,16 @@ class NewEnclaveHandler(EnclavesHandler):
 
         else:
             print(self.request.arguments)
-            desired_enclave = self.graph.enclaves.create(name=self.get_argument("name"),
-                                                         privacy=self.get_argument("privacy"))
+            desired_enclave = self.graph.enclaves.create(\
+                    name=self.get_argument("name"),\
+                    privacy=self.get_argument("privacy"))
+
             # current user - moderates -> new enclave
             self.graph.moderates.create(self.get_current_user(),desired_enclave)
             # current user - owns -> new enclave
             self.graph.owns.create(self.get_current_user(),desired_enclave)
+
+
             self.redirect("/~"+self.get_argument("name"))
 
 class EnclaveHandler(EnclavesHandler):
@@ -384,18 +493,22 @@ class EnclaveHandler(EnclavesHandler):
     @EnclavesHandler.require_login
     def get(self):
 
-        # this is a potential injection point, since I'm just reading from the URI directly.
-        # therefore, TODO: implement santizing of self.request.uri before passing it to Titan.
+        # this is a potential injection point, 
+        # since I'm just reading from the URI directly.
+        # therefore, TODO: implement santizing of 
+        # self.request.uri before passing it to Titan.
         # but don't really care for now
 
-        current_enclave = self.graph.enclaves.index.lookup(name=self.request.uri[2:])
+        current_enclave = self.graph.enclaves.index.lookup(\
+                name=self.request.uri[2:])
         if not current_enclave:
             self.render_template("new_enclave.html",
                     error_message="This enclave doesn't exist yet.\
                             You can create it if you'd like.")
         else:
             current_enclave = current_enclave.next()
-            self.render_template("enclave.html", enclave_name=current_enclave.name)
+            self.render_template("enclave.html",\
+                    enclave_name=current_enclave.name)
             
 
 

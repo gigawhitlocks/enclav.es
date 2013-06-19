@@ -20,32 +20,33 @@
 {% block content %}
 <div class="sixteen columns">
 	<p>
-	Post something cool! Original content is the best content!
+	Post something good! Original content is the best content!
 	</p>
 </div>
 <div class="sixteen columns">
-	<form id="switch_form">Post Type:
-				<input type="radio" id="text" name="post_type">
+	<form id="new_post" action="/new_post" method="post" style="text-align: left">
+		Post Type:
+				<input type="radio" id="text" name="post_type" value="text">
 				<label for="text">Text</label></input>
-				<input type="radio" id="link" name="post_type" checked>
+				<input type="radio" id="link" name="post_type" value="link" checked>
 				<label for="link">Link</label></input>
-				<input type="radio" id="image" name="post_type">
+				<input type="radio" id="image" name="post_type" value="image">
 				<label for="image">Image</label></input>
-	</form>
-					<form id="new_post" action="/new_post" method="post" style="text-align: left">
-									<div id="form_div">
-										<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-										Post title:	<input type="text" name="title">
-										URL of link:<input type="text" name="url">
-									</div>
-									Post to enclave:<input type="text" name="enclave"{% if enclave is defined %} value="{{ enclave }}"{% endif %}>
-									Post as this identity:
-									<select name="identity">
-													{% for identity in identities %}
-														<option value="{{ identity }}">{{ identity }}</option>
-													{% endfor %}
-									</select>
-									<input type="submit" value="Post!" style="margin:0">	
+
+				<div id="form_div"> <!-- gets swapped out by JS -->
+					<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+					Post title:	<input type="text" name="title">
+					URL of link:<input type="text" name="url">
+				</div><!-- end JS danger zone -->
+
+				Post to enclave:<input type="text" name="enclave"{% if enclave is defined %} value="{{ enclave }}"{% endif %}>
+				Post as this identity:
+				<select name="identity">
+								{% for identity in identities %}
+									<option value="{{ identity }}">{{ identity }}</option>
+								{% endfor %}
+				</select>
+				<input type="submit" value="Post!" style="margin:0">	
 </div>
 
 {% endblock content %}

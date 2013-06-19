@@ -19,7 +19,6 @@ class Enclave(Node):
     #determines whether posts in the enclave are visible to the wider community
     #when set to 1, membership_required is assumed to be 1
     privacy = String(nullable=False, default="public")
- 
 
 class Moderates(Relationship):
     """User --Moderates--> Enclave"""
