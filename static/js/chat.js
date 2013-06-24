@@ -6,6 +6,7 @@ var sendchat = (function() {
 	window.addEventListener("unload", connection.close);
 
 	connection.onopen = function(){
+		//TODO: query server for existing users to build the user list
 		console.log("Connection opened!");
 	};
 
@@ -22,13 +23,22 @@ var sendchat = (function() {
 			var message = JSON.parse(e.data);
 			switch ( message.type ){
 				case "join":
-					$("#chatbox").append("<i><span style=\"color:green\">"+message.user+" has joined the room.</span></i><br />");
+					$("#chatbox")
+						.append("<span class=\"chat_notice\">"
+								+message.user+" has joined the room.</span><br />");
+					$("#userlist")
+						.append("<span id=\""+message.user+"_list\">"+message.user+"</span><br />");
 					break;
 				case "part":
-					$("#chatbox").append("<i><span style=\"color:green\">"+message.user+" has left the room.</span></i><br />");
+					$("#chatbox")
+						.append("<i><span class=\"chat_notice\">"
+								+message.user+" has left the room.</span></i><br />");
 					break;
 				case "chat":
-					$("#chatbox").append("<strong>"+message.user + ":</strong> " + message.message + "<br />");
+					$("#chatbox")
+						.append("<strong><span style=\"color: blue;\">" // TODO: mIRC-style username colors
+								+message.user+":</strong></span> " + message.message + "<br />");
+					$("#userlist").remove("#"+message.user+"_list");
 					break;
 				default:
 					console.log("Malformed message from server \""+message+"\"");
