@@ -3,6 +3,7 @@
 
 var sendchat = (function() {
 	var connection = new WebSocket('ws://'+window.location.host+window.location.pathname+'/chatws');
+	window.addEventListener("unload", connection.close);
 
 	connection.onopen = function(){
 		console.log("Connection opened!");
@@ -15,6 +16,7 @@ var sendchat = (function() {
 	connection.onerror = function() {
 		console.log("Error detection");
 	};
+
 	connection.onmessage = function(e){
 		if ( e !== undefined ) {
 			var message = JSON.parse(e.data);
