@@ -3,6 +3,7 @@ from handlers import EnclavesHandler
 
 class EnclaveSocket(websocket.WebSocketHandler):
     clients = {}    
+
     def get_enclave(self):
         return self.request.uri.split("/")[1][1:]
 
@@ -32,11 +33,13 @@ class ChatSocket(EnclaveSocket):
     def broadcast(self, message):
         """ broadcast <message> to all connected clients """
         for client in self.clients[self.get_enclave()]:
-            # message should be a dict
-            client.write_message(message)
+            try:
+                client.write_message(message)
+            except AttributeError: # wut
+                pass
 
-    @EnclavesHandler.require_login
     def open(self):
+    #    print(self.clients)
         curr_enc = self.get_enclave()
         if curr_enc not in self.clients.keys():
             self.clients[curr_enc] = []
@@ -45,14 +48,12 @@ class ChatSocket(EnclaveSocket):
         self.broadcast({"type":"join", "user":self.get_secure_cookie("userid")})
         
 
-    @EnclavesHandler.require_login
     def on_message(self, message):
         self.broadcast(\
                 {"type":"chat", \
                 "user":self.get_secure_cookie("userid"),\
                 "message":message})
                 
-    @EnclavesHandler.require_login
     def on_close(self):
         self.broadcast({"type":"part", "user":self.get_secure_cookie("userid")}) #TODO: %s/self.get_secure_cookie/bound_ID/g
         self.clients[self.get_enclave()].remove(self)
