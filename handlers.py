@@ -82,7 +82,7 @@ class EnclavesHandler(tornado.web.RequestHandler):
 
         # create special "all" enclave if it doesn't exist.
         if (graph.enclaves.index.lookup(name="all") is None):
-            All = graph.enclaves.create(name="all")
+            All = graph.enclaves.create(name="all", tagline="all enclaves")
             graph.owns.create(graph.users.index.lookup("root"),All)
                 
 

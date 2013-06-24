@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% set enclave = enclave_name %}
+{% block header %}
+<script type="text/javascript" src="/js/chat.js"></script>
+{% endblock header %}
+
 {% block content %}
 {{ enclave_name }}
 {% endblock content %}

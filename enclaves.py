@@ -10,7 +10,7 @@ class Enclave(Node):
     element_type = "enclave"
     created = DateTime(default=current_datetime, nullable=False)
     name = String(nullable=False)
-    tagline = String(nullable=False)
+#    tagline = String(nullable=False)
 
     #gov_type will define government type for a given Enclave
     #Will hopefully eventually include Monarchy and Democracy at least
