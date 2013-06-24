@@ -2,8 +2,31 @@
 {% set enclave = enclave_name %}
 {% block header %}
 <script type="text/javascript" src="/js/chat.js"></script>
+<script type="text/javascript">
+	$("document").ready(function(){ 
+
+			$("#chatinput").keypress(function(event) {
+				if (event.which == 13) {
+					sendmessage($("#chatinput").val());
+					$("#chatinput").val("");
+				}
+			});
+
+	});
+</script>
+
 {% endblock header %}
 
 {% block content %}
+<div class="sixteen columns">
+	<div class="chatbox" id="chatbox" name="chatbox" style="background-color: white; margin-top: 10px; margin-bottom:10px; min-height: 200px;">
+	</div>
+</div>
+<div class="sixteen columns">
+	<input type="text" id="chatinput" name="chatinput" style="width:100%">
+</div>
+
+
+
 {{ enclave_name }}
 {% endblock content %}
