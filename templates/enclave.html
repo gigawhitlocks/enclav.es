@@ -7,7 +7,7 @@
 
 			$("#chatinput").keypress(function(event) {
 				if (event.which == 13) {
-					sendmessage($("#chatinput").val());
+					sendchat($("#chatinput").val());
 					$("#chatinput").val("");
 				}
 			});
@@ -19,7 +19,9 @@
 
 {% block content %}
 <div class="sixteen columns">
-	<div class="chatbox" id="chatbox" name="chatbox" style="background-color: white; margin-top: 10px; margin-bottom:10px; min-height: 200px;">
+	<div class="chatbox thirteen columns alpha" id="chatbox" name="chatbox" style="background-color: white; margin-top: 10px; margin-bottom:10px; min-height: 200px; padding:10px;">
+	</div>
+	<div class="userlist three colums omega" id="userlist" style="background-color: white; margin-top: 10px; margin-bottom:10px; min-height: 200px; padding: 10px;">
 	</div>
 </div>
 <div class="sixteen columns">

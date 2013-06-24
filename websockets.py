@@ -29,27 +29,31 @@ class PostSocket(websocket.WebSocketHandler):
     
 class ChatSocket(EnclaveSocket):
 
+    def broadcast(self, message):
+        """ broadcast <message> to all connected clients """
+        for client in self.clients[self.get_enclave()]:
+            # message should be a dict
+            client.write_message(message)
+
     @EnclavesHandler.require_login
     def open(self):
         curr_enc = self.get_enclave()
         if curr_enc not in self.clients.keys():
             self.clients[curr_enc] = []
         self.clients[curr_enc].append(self)
-        for client in self.clients[curr_enc]:
-            client.write_message(u"Socket opened. %s" %client)
+        
+        self.broadcast({"type":"join", "user":self.get_secure_cookie("userid")})
         
 
-#    @EnclavesHandler.require_login
+    @EnclavesHandler.require_login
     def on_message(self, message):
-        curr_enc = self.get_enclave()
-        print(message)
-
-        # forwards received message to all other relevant clients
-        for client in self.clients[curr_enc]:
-            client.write_message({"user":self.get_secure_cookie("userid"),\
+        self.broadcast(\
+                {"type":"chat", \
+                "user":self.get_secure_cookie("userid"),\
                 "message":message})
-    
+                
     @EnclavesHandler.require_login
     def on_close(self):
+        self.broadcast({"type":"part", "user":self.get_secure_cookie("userid")}) #TODO: %s/self.get_secure_cookie/bound_ID/g
         self.clients[self.get_enclave()].remove(self)
 

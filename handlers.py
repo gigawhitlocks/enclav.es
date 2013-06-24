@@ -24,6 +24,8 @@ import riak
 import uuid
 import time
 
+import functools
+
 from xml.sax.saxutils import quoteattr
 
 class EnclavesHandler(tornado.web.RequestHandler):
@@ -144,7 +146,8 @@ class EnclavesHandler(tornado.web.RequestHandler):
         """
         Use as a decorator around functions that require the user be logged in
         """
-        def new_function(self):
+        @functools.wraps(function)
+        def new_function(self, *args, **kwargs):
             if (not self.is_logged_in()):
                 self.forbidden()
             function(self, *args, **kwargs)

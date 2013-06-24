@@ -1,7 +1,7 @@
 /* jshint strict: true */
 /* globals console */
 
-var sendmessage = (function() {
+var sendchat = (function() {
 	var connection = new WebSocket('ws://'+window.location.host+window.location.pathname+'/chatws');
 
 	connection.onopen = function(){
@@ -18,8 +18,19 @@ var sendmessage = (function() {
 	connection.onmessage = function(e){
 		if ( e !== undefined ) {
 			var message = JSON.parse(e.data);
-			console.log(message);
-			$("#chatbox").append(message.user + ": " + message.message + "<br />");
+			switch ( message.type ){
+				case "join":
+					$("#chatbox").append("<i><span style=\"color:green\">"+message.user+" has joined the room.</span></i><br />");
+					break;
+				case "part":
+					$("#chatbox").append("<i><span style=\"color:green\">"+message.user+" has left the room.</span></i><br />");
+					break;
+				case "chat":
+					$("#chatbox").append("<strong>"+message.user + ":</strong> " + message.message + "<br />");
+					break;
+				default:
+					console.log("Malformed message from server \""+message+"\"");
+			}
 		}
 	};
 
