@@ -513,12 +513,15 @@ class EnclaveHandler(EnclavesHandler):
             current_enclave = current_enclave.next()
             posts_generator = current_enclave.inV("posted_to")
             posts = []
-            for post in posts_generator:
-                    posts.append([post, self.get_poster(post).handle])
+            try:
+                for post in posts_generator:
+                        posts.append([post, self.get_poster(post).handle])
 
-            self.render_template("enclave.html",\
-                    enclave_name=current_enclave.name, posts=posts)
-            
+                self.render_template("enclave.html",\
+                        enclave_name=current_enclave.name, posts=posts)
+            except TypeError:
+                self.render_template("enclave.html",\
+                        enclave_name=current_enclave.name)
 
 
 class UserHandler(EnclavesHandler):
