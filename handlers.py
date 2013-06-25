@@ -364,8 +364,8 @@ class NewPostHandler(EnclavesHandler):
     def post(self):
 
         
-        curr_enclave=self.request.uri.split("/")[1][1:] \
-                if self.request.uri[0:2] == "/~" else None
+  #      curr_enclave=self.request.uri.split("/")[1][1:] \
+   #             if self.request.uri[0:2] == "/~" else None
 
         valid_identities = [i.handle for i in self.get_identities()]
 
@@ -511,8 +511,13 @@ class EnclaveHandler(EnclavesHandler):
                             You can create it if you'd like.")
         else:
             current_enclave = current_enclave.next()
+            posts_generator = current_enclave.inV("posted_to")
+            posts = []
+            for post in posts_generator:
+                    posts.append([post, self.get_poster(post).handle])
+
             self.render_template("enclave.html",\
-                    enclave_name=current_enclave.name)
+                    enclave_name=current_enclave.name, posts=posts)
             
 
 

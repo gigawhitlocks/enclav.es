@@ -9,6 +9,8 @@
 				if (event.which == 13) {
 					sendchat($("#chatinput").val());
 					$("#chatinput").val("");
+					console.log($("#chatbox").scrollHeight);
+					$("#chatbox").animate({scrollTop: $("#chatbox")[0].scrollHeight}, 200);
 				}
 			});
 
@@ -18,17 +20,23 @@
 {% endblock header %}
 
 {% block content %}
-<div class="sixteen columns">
-	<div class="chatbox thirteen columns alpha" id="chatbox" name="chatbox">
-	</div>
-	<div class="chatbox three columns omega" id="userlist">
+<div class="sixteen columns alpha omega">
+	<div class="chatbox" id="chatbox" name="chatbox">
 	</div>
 </div>
-<div class="sixteen columns">
-	<input type="text" id="chatinput" name="chatinput" style="width:100%">
+<div class="sixteen columns alpha omega">
+	<input type="text" id="chatinput" name="chatinput" style="width: 100%">
 </div>
 
+<div class="sixteen columns">
+	<ul>
+		{% if posts is defined %}
+			{% for link in posts|reverse %}
+			<li><h4><a href="{{link[0].url}}" target="_blank">{{link[0].title}}</a></h4>
+			Posted by <a href="/u/{{link[1]}}">{{link[1]}}</a> at {{link[0].created}}</li>
+			{% endfor %}
+		{% endif %}
+	</ul>
+</div>
 
-
-{{ enclave_name }}
 {% endblock content %}

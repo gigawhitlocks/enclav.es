@@ -63,9 +63,6 @@ input[type="button"]:active {
 	overflow: auto;
 	overflow-x: hidden;
 	background-color: white;
- 	margin-top: 10px;
- 	margin-bottom:10px;
- 	min-height: 200px;
- 	padding:10px;
-
+	height: 12em;
+	padding: .5em;
 }
