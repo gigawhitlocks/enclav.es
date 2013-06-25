@@ -7,9 +7,11 @@
 
 			$("#chatinput").keypress(function(event) {
 				if (event.which == 13) {
+					//sends the message to the server via websocket
 					sendchat($("#chatinput").val());
+					//clears the chat input box
 					$("#chatinput").val("");
-					console.log($("#chatbox").scrollHeight);
+					//keeps the main chatbox scrolled down
 					$("#chatbox").animate({scrollTop: $("#chatbox")[0].scrollHeight}, 200);
 				}
 			});
@@ -28,15 +30,20 @@
 	<input type="text" id="chatinput" name="chatinput" style="width: 100%">
 </div>
 
-<div class="sixteen columns">
-	<ul>
-		{% if posts is defined %}
-			{% for link in posts|reverse %}
-			<li><h4><a href="{{link[0].url}}" target="_blank">{{link[0].title}}</a></h4>
-			Posted by <a href="/u/{{link[1]}}">{{link[1]}}</a> at {{link[0].created}}</li>
-			{% endfor %}
-		{% endif %}
-	</ul>
-</div>
+<ul>
+	{% if posts is defined %}
+		{% for post in posts|reverse %}
+		<div class="eight columns"{% if loop.index % 2 == 0 %} style="float:right"{%endif%}>
+	<li><h4><a href={{post[0].url}} target="_blank">{{post[0].title}}</a></h4>
+			{% if post[0].post_type == "image" %}
+			<img src={{post[0].url}} style="max-width:100%"/><br />
+			{% elif post[0].post_type == "text" %}
+			<div class="post_body">{{post[0].body_text}}</div>
+			{% endif %}
+			Posted by <a href="/u/{{post[1]}}">{{post[1]}}</a> at {{post[0].created}}</li>
+	</div>
+		{% endfor %}
+	{% endif %}
+</ul>
 
 {% endblock content %}

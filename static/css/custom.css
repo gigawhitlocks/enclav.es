@@ -66,3 +66,9 @@ input[type="button"]:active {
 	height: 12em;
 	padding: .5em;
 }
+
+.post_body {
+	margin:0;
+	background-color:#EEEEEE;
+	border: 1px solid #4e9268;
+}

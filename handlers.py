@@ -25,6 +25,7 @@ import uuid
 import time
 
 import functools
+from xml.sax.saxutils import quoteattr, escape
 
 class EnclavesHandler(tornado.web.RequestHandler):
     # db config
@@ -396,13 +397,14 @@ class NewPostHandler(EnclavesHandler):
         post_type = self.get_argument("post_type")
         if ( post_type == "link" or post_type == "image" ):
             newpost = self.graph.posts.create(
-                                    title=self.get_argument("title"),
-                                    url=self.get_argument("url"),
+                                    title=escape(self.get_argument("title")),
+                                    url=quoteattr(self.get_argument("url")),
                                     post_type=post_type)
         elif (post_type == "text"):
             newpost = self.graph.posts.create(
-                                    title=self.get_argument("title"),
-                                    body_text=self.get_argument("body"),
+                                    title=escape(self.get_argument("title")),
+                                    body_text=escape(
+                                        self.get_argument("body")),
                                     post_type=post_type)
         else:
             # hopefully we won't ever see this :)

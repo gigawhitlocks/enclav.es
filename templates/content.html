@@ -4,14 +4,7 @@
 
 {% block content %}
 <div class="ten columns">
-	<ul>
-		{% if posts is defined %}
-			{% for link in posts|reverse %}
-			<li><h4><a href="{{link[0].url}}" target="_blank">{{link[0].title}}</a></h4>
-			Posted by <a href="/u/{{link[1]}}">{{link[1]}}</a> at {{link[0].created}}</li>
-			{% endfor %}
-		{% endif %}
-	</ul>
+	The front page is not yet ready. Please visit an enclave to see some content.
 </div>
 <div class="six columns">
 	<ul><h4>Current Enclaves</h4>

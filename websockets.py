@@ -58,6 +58,7 @@ class ChatSocket(EnclaveSocket):
                 
     @EnclavesHandler.require_login
     def on_close(self):
-        self.broadcast({"type":"part", "user":self.get_secure_cookie("userid")}) #TODO: %s/self.get_secure_cookie/bound_ID/g
+        self.broadcast({"type":"part", "user":self.get_secure_cookie("userid")})
+        #TODO: %s/self.get_secure_cookie/bound_ID/g
         self.clients[self.get_enclave()].remove(self)
 
