@@ -12,7 +12,7 @@ from bulbs.config import Config
 from jinja2 import Environment, FileSystemLoader
 
 from users import Invitee, User, Invited, Identity, Is
-from posts import Post, PostedBy
+from posts import Post, PostedTo, PostedBy
 from enclaves import Enclave, Moderates, Owns
 
 from hashing_passwords import make_hash as generate_storable_password,\
@@ -25,8 +25,6 @@ import uuid
 import time
 
 import functools
-
-from xml.sax.saxutils import quoteattr
 
 class EnclavesHandler(tornado.web.RequestHandler):
     # db config
@@ -68,6 +66,7 @@ class EnclavesHandler(tornado.web.RequestHandler):
   
     #relationships
     graph.add_proxy("posted_by", PostedBy)
+    graph.add_proxy("posted_to", PostedTo)
     graph.add_proxy("invited", Invited)
     graph.add_proxy("Is", Is)
     graph.add_proxy("moderates", Moderates)
@@ -85,7 +84,7 @@ class EnclavesHandler(tornado.web.RequestHandler):
         # create special "all" enclave if it doesn't exist.
         if (graph.enclaves.index.lookup(name="all") is None):
             All = graph.enclaves.create(name="all", tagline="all enclaves")
-            graph.owns.create(graph.users.index.lookup("root"),All)
+            graph.owns.create(graph.users.index.lookup(userid="root"),All)
                 
 
     graph.scripts.update("traversals.groovy")
@@ -181,20 +180,24 @@ class LandingPageHandler(EnclavesHandler):
             self.render_template("landingpage.html")
 
         else:
-#            posts=[]
-#            i=0
-#            for post in self.graph.posts.get_all():
-#                if i > 20:
-#                    break
-#                else:
-#                    i+=1
-#                    posts.append([post, self.get_poster(post).handle])
+            posts=[]
+            i=0
+            try:
+                for post in self.graph.posts.get_all():
+                    if i > 20:
+                        break
+                    else:
+                        i+=1
+                        posts.append([post, self.get_poster(post).handle])
+            except TypeError: #happens when self.graph.posts.get_all is None
+                pass
+
             enclaves=[]
-#            i=0
+            i=0
             for enclave in self.graph.enclaves.get_all():
                enclaves.append(enclave)
 
-            self.render_template('content.html', enclaves=enclaves)
+            self.render_template('content.html', posts=posts, enclaves=enclaves)
 
     def post(self):
         """
@@ -356,24 +359,13 @@ class NewPostHandler(EnclavesHandler):
         self.render_template("new_post.html",\
                 identities=[i.handle for i in self.get_identities()],
                 enclave=curr_enclave)
-    
-    def create_post_dict(self):
-        data = {}
-        data['title'] = quoteattr(self.get_argument("title"))
-        post_type = self.get_argument("post_type")
-
-        if post_type == "text":
-            data['body_text'] = quoteattr(self.get_argument("body"))
-        elif post_type == "image" or post_type == "link" :
-            data['url'] = quoteattr(self.get_argument("url"))
-        else:
-            raise Exception("bad post type")
-
-        return data
 
     @EnclavesHandler.require_login
     def post(self):
 
+        
+        curr_enclave=self.request.uri.split("/")[1][1:] \
+                if self.request.uri[0:2] == "/~" else None
 
         valid_identities = [i.handle for i in self.get_identities()]
 
@@ -387,33 +379,45 @@ class NewPostHandler(EnclavesHandler):
                 ident_to_post_with = i
                 break
         
-        post_to = self.get_argument("enclave")
+        temp = self.get_argument("enclave")
+        if temp == "":
+            temp = "all"
+
+        post_to = self.graph.enclaves.index.lookup(name=temp)
+        if post_to is None:
+            print ("post_to is none")
+            self.render_template("new_post.html",\
+                    error_message="That enclave does \
+                    not exist. Please post to an existing \
+                    enclave or leave the field blank.",\
+                    identities=valid_identities)
+            return
+
         post_type = self.get_argument("post_type")
-        bucket_name = post_to + ":" + post_type if post_to != "" \
-                else "all:" + post_type
+        if ( post_type == "link" or post_type == "image" ):
+            newpost = self.graph.posts.create(
+                                    title=self.get_argument("title"),
+                                    url=self.get_argument("url"),
+                                    post_type=post_type)
+        elif (post_type == "text"):
+            newpost = self.graph.posts.create(
+                                    title=self.get_argument("title"),
+                                    body_text=self.get_argument("body"),
+                                    post_type=post_type)
+        else:
+            # hopefully we won't ever see this :)
+            print(post_type)
+            self.render_template("new_post.html",\
+                    error_message="Invalid post type",\
+                    identities=valid_identities)
+            return
 
-        # creates post and stores it in riak.
-        # stored in bucket where bucket name == enclave_name/post_type. whoo.
-        # if not posting to an enclave, posts to bucket/meta-enclave 'all'
+        if newpost:
+            post_to = post_to.next()
+            self.graph.posted_by.create(newpost,ident_to_post_with)   
+            self.graph.posted_to.create(newpost,post_to) 
 
-        bucket = self.riak_client.bucket(bucket_name)
-        curr_time = EnclavesHandler.int_time()
-        key = str(curr_time)+":"+str(ident_to_post_with.eid)
-        riakpost = bucket.new(key,
-                data = self.create_post_dict())
-        riakpost.add_index('time_int', curr_time)
-        riakpost.add_index('uid_int', ident_to_post_with.eid)
-        riakpost.add_index('uid_bin', ident_to_post_with.handle)
-        riakpost.store()
-        print(bucket_name)
-        print(key)
-
-        # adds the Post to the graph. Note that 
-        # ALL THAT THIS DOES is link to riak for actual data
-        newpost = self.graph.posts.create(riak_key=key, riak_bucket=bucket_name)
-        self.graph.posted_by.create(newpost,ident_to_post_with)   
-
-        self.redirect("/")
+            self.redirect("/")
 
 class PostHandler(EnclavesHandler):
 

@@ -34,13 +34,13 @@ var sendchat = (function() {
 					$("#chatbox")
 						.append("<i><span class=\"chat_notice\">"
 								+message.user+" has left the room.</span></i><br />");
+					$("#userlist").remove("#"+message.user+"_list");
 					break;
 
 				case "chat":
 					$("#chatbox")
 						.append("<strong><span style=\"color: blue;\">" // TODO: mIRC-style username colors
 								+message.user+":</strong></span> " + message.message + "<br />");
-					$("#userlist").remove("#"+message.user+"_list");
 					break;
 
 				default:

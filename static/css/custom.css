@@ -58,3 +58,14 @@ input[type="button"]:active {
 	color:#4E9258; 
 	font-style: italic;
 }
+
+.chatbox {
+	overflow: auto;
+	overflow-x: hidden;
+	background-color: white;
+ 	margin-top: 10px;
+ 	margin-bottom:10px;
+ 	min-height: 200px;
+ 	padding:10px;
+
+}

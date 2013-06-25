@@ -38,6 +38,7 @@ class ChatSocket(EnclaveSocket):
             except AttributeError: # wut
                 pass
 
+    @EnclavesHandler.require_login
     def open(self):
     #    print(self.clients)
         curr_enc = self.get_enclave()
@@ -48,12 +49,14 @@ class ChatSocket(EnclaveSocket):
         self.broadcast({"type":"join", "user":self.get_secure_cookie("userid")})
         
 
+    @EnclavesHandler.require_login
     def on_message(self, message):
         self.broadcast(\
                 {"type":"chat", \
                 "user":self.get_secure_cookie("userid"),\
                 "message":message})
                 
+    @EnclavesHandler.require_login
     def on_close(self):
         self.broadcast({"type":"part", "user":self.get_secure_cookie("userid")}) #TODO: %s/self.get_secure_cookie/bound_ID/g
         self.clients[self.get_enclave()].remove(self)

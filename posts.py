@@ -7,8 +7,20 @@ class Post(Node):
     don't instantiate a plain post. this just serves
     as a parent class for the other post types for shared values
     """
-    riak_key = String(nullable=False)
-    riak_bucket = String(nullable=False)
+    element_type = "post"
+    post_type = String(nullable=False)
+    
+    # when was it created?
+    created = DateTime(default=current_datetime, nullable=False)
+
+    # title of the post?
+    title = String(nullable=False)
+
+    url = String(nullable=True)
+    body_text = String(nullable=True)
+
+class Comment(Post):
+    element_type = "comment"
 
 class PostedBy(Relationship):
 
@@ -30,6 +42,5 @@ class HasReply(Relationship):
     """Relationship for threading conversations
     Post--has_reply-->Comment OR 
     Comment--HasReply-->Comment"""
-
     label = "has_reply"
     created = DateTime(default=current_datetime, nullable=False)
